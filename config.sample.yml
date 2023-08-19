@@ -1,0 +1,104 @@
+# This is a sample config file for the python scripts
+# You can copy this file and rename it to config.yml
+# You can also rename the scripts to whatever you want, just make sure to update the config file to match
+# The config file is broken up into sections, each section is a script
+# Each script has a log_level and dry_run option
+# log_level can be: debug, info, warning, error, critical
+# dry_run can be true or false
+# The rest of the options are script specific
+global:
+  log_level: info
+  radarr:
+    # name is the name of the radarr instance, this is used to reference the instance in other scripts
+    - name: radarr_1
+      # api is the api key for the radarr instance
+      api: abcdefghijlmnop
+      # url is the url for the radarr instance
+      url: http://localhost:7878
+    - name: radarr_2
+      api: abcdefghijklmnop
+      url: http://localhost:1212
+  sonarr:
+    # name is the name of the sonarr instance, this is used to reference the instance in other scripts
+    - name: sonarr_1
+      # api is the api key for the sonarr instance
+      api: abcdefghijlmnop
+      # url is the url for the sonarr instance
+      url: http://localhost:8989
+    # name is the name of the second sonarr instance, this is used to reference the instance in other scripts, names must match
+    - name: sonarr_2
+      api: abcdefghijlmnop
+      url: http://localhost:9090
+  plex:
+    # name is the name of the plex instance, this is used to reference the instance in other scripts
+    - name: plex
+      # api is the token key for the plex instance, if you don't know your token please see https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
+      api: abcdefghijlmnop
+      # url is the url for the plex instance
+      url: http://localhost:32400
+
+# THIS SCRIPT SYNCS DRAZZILB GDRIVE POSTERS TO A LOCAL FOLDER. ANYTHING UNIQUE IN THE FOLDER WILL BE DELETED.
+# DRAZZ UPDATES POSTERS WEEKLY FROM TPDB MUSIKMANN2000
+#    1. Get an rclone client ID and Secret following these instructions:
+#    https://rclone.org/drive/#making-your-own-client-id
+#    2. Then get a token following these instructions:
+#    https://rclone.org/remote_setup/
+# DRAZZILB GDRIVE ID: 1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z
+# This script is meant to be used in conjuction with Plex-Meta-Manager, however it can be used on it's own.
+# This is a script base of this one: https://discord.com/channels/492590071455940612/1124032073557086258/1126226814629576858
+sync_gdrive:
+  client_id: asdasds.apps.googleusercontent.com # Client ID for rclone usually ends with .apps.googleusercontent.com
+  client_secret: GOCSPX-asda123 # Client Secret for rclone, usually starts with GOCSPX-
+  sync_location: /data/input # Where you want to sync the posters to
+  gdrive_id: 1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z # The ID of the folder you want to sync from
+  token: # The token for rclone, this is the output of rclone config dump that needs to run manually
+  # Token looks like this: { "access_token": "value", "token_type": "Bearer", "refresh_token": "value", "expiry": "value" }
+
+# The renamer script is used to rename your posters to match your Plex Collections and Media Folder names for Movies and TV Shows
+# This script is meant to be used in conjuction with Plex-Meta-Manager, however it can be used on it's own.
+renamer:
+  # Script Note: --> is a copy/move & rename / -->> is a copy/move w/o rename
+  log_level: info
+  # Options are 'true' or 'false'
+  dry_run: true
+  asset_folders: false
+  # Options are 'Copy' or 'Move'
+  action_type: move
+  print_only_renames: true
+  # Library names are used to match collections posters to the collections listed w/in Plex. Typically Movie Libraries are used
+  library_names:
+    - Movies
+    - TV Shows
+    - Anime Movies
+  # Where your ingest movies folder is (THe source and destination should not be the same directory)
+  source_dir: /path/to/posters/ <--- Lowest priority
+  # What posters you'd like to override the souce dir with. This dir will take priority for assets over source_dir
+  # To not use any override, simply leave it blank or remove it from the config
+  # Can be a single dir or a list of dirs
+  source_overrides:
+    - /path/to/posters/override/ <--- Middle priority
+    - /path/to/posters/override2/ <--- Highest priority
+  # Where your posters are going to go. In my usecase I use Plex-Meta-Manager. This is the /config/assets dir for PMM for me.
+  destination_dir: /path/to/poster/destination
+  # The thresholds are used to consider what is a "Match", As with any automation there is never a 100% guarantee of accuracy. There will be times the script will mess up.
+  # If however you see it messing up more often on things you can restrict the threshold.
+  # 0 = Anything goes, 100 = Must be exact match
+  # The default numbers here are based upon what I've seen to be the most effective, I've had one-offs where I had to manually fix things.
+  # Eg. Hanna vs Anna, One letter difference and in the case I had the years were the same too.
+  movies_threshold: 96
+  series_threshold: 96
+  collection_threshold: 99
+  # Decide which radarr instance you will be using for renamer, this is useful if you have for example: A Sonarr/Sonarr-Anime and/or Radarr/Radarr-Anime
+  # If you however duplicate entries between a Radarr/Radarr4K for example. this won't help and will only double the work for the script for no gain.
+  radarr:
+    - name: radarr_1
+  sonarr:
+    - name: sonarr_1
+    - name: sonarr_2
+
+# The fix_border script is used to fix the border colour of posters that sync_gdrive script downloads.
+# This is a script base of this one: https://github.com/listentofaze/mm2k-border-replacer/tree/main#mm2k-poster-border-colour-replacer
+fix_border:
+  input_folder: /data/input # Where your posters are going to be coming from
+  output_folder: /data/fix_posters # Where your posters are going to go
+  border_color: "#000000" # The colour of the border, default is black

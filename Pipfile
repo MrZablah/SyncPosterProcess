@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fuzzywuzzy = "*"
+plexapi = "*"
+python-Levenshtein = "*"
+pytz = "*"
+pyyaml = "*"
+requests = "*"
+schedule = "*"
+tqdm = "*"
+unidecode = "*"
+
+[dev-packages]
+flake8 = "*"
+
+[requires]
+python_version = "3.10"
