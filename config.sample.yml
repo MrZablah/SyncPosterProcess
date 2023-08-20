@@ -102,4 +102,4 @@ fix_border:
   run: true # If false it will skip this step
   input_folder: /data/input # Where your posters are going to be coming from
   output_folder: /data/fix_posters # Where your posters are going to go
-  border_color: "#000000" # The colour of the border, default is black
+  border_color: none # This will remove the border of the image but you can also add a color to change th border to any hex color, Ej: '#000000'

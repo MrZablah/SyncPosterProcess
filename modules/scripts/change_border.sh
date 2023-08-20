@@ -80,8 +80,15 @@ find "$input_folder" -type f \( -iname "*.jpg" -o -iname "*.png" \) | while read
     output_dir=$(dirname "$output_path")
     mkdir -p "$output_dir"
 
+    # Clean border color variable
+    border_color=`sed -e "s/^'//" -e "s/'$//" <<<$border_color`
+
     # Process the image using ImageMagick
-    convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor "$border_color" -border 25x25 "$output_path"
+    if [ "$border_color" == "none" ]; then
+      convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 "$output_path"
+    else
+      convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor $border_color -border 25x25 "$output_path"
+    fi
     verbose_echo "Processed: $output_path"
 
     processed_files=$((processed_files + 1))

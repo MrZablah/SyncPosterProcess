@@ -165,3 +165,4 @@ data/
 *archives*
 tmp/
 rclone/
+/.idea/
