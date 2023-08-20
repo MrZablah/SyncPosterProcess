@@ -27,6 +27,7 @@ class Config:
         self.plex_data = self.global_data.get('plex', {})  # Use empty dict if plex data is not found
         self.radarr_data = self.global_data.get('radarr', {})  # Use empty dict if radarr data is not found
         self.sonarr_data = self.global_data.get('sonarr', {})  # Use empty dict if sonarr data is not found
+        self.run = self.script_data.get('run', True)  # By default, run the script if not specified
 
         # Typical variables
         self.dry_run = self.script_data.get('dry_run', False)  # Use False as default value for dry_run if not provided

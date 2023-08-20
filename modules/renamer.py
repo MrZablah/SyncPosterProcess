@@ -544,6 +544,10 @@ def print_output(final_output):
 
 
 def main():
+    if not config.run:
+        logger.info("Skipping renamer.py")
+        return
+
     logger.debug('*' * 40)
     logger.debug(f'* {"Script Input Validated":^36} *')
     logger.debug('*' * 40)

@@ -23,4 +23,7 @@ logger.debug(f"RClone command with args: {command}")
 
 # Main function
 def main():
-    call_script(command, logger)
+    if config.run:
+        call_script(command, logger)
+    else:
+        logger.info("Skipping sync_gdrive.py")

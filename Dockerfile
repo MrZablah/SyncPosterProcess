@@ -28,10 +28,6 @@ LABEL maintainer="MrZablah" \
 
 # Set working directory, copy source into container
 WORKDIR /app
-COPY . /app
-
-# give permissions to all files under /modules/scripts
-RUN chmod -R 777 /app/modules/scripts
 
 # Copy python packages from python-reqs
 COPY --from=python-reqs /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
@@ -54,8 +50,7 @@ RUN set -eux; \
     groupadd -g 99 dockeruser; \
     useradd -u 100 -g 99 dockeruser; \
     apt-get update; \
-    apt-get install -y --no-install-recommends wget curl unzip imagemagick libmagickcore-6.q16-6-extra tzdata; \
-    cp modules/policy.xml /etc/ImageMagick-6/policy.xml
+    apt-get install -y --no-install-recommends wget curl unzip imagemagick libmagickcore-6.q16-6-extra tzdata;
 
 # Install rclone dependencies and rclone
 RUN curl https://rclone.org/install.sh | bash && \
@@ -68,6 +63,15 @@ RUN rclone --version
 
 # logs directory
 RUN mkdir -p /logs
+
+# Copy source into container
+COPY . .
+
+# give permissions to all files under /modules/scripts
+RUN chmod -R 777 /app/modules/scripts
+
+# copy policy.xml to override default ImageMagick policy
+RUN cp modules/policy.xml /etc/ImageMagick-6/policy.xml
 
 # Entrypoint
 CMD ["python", "main.py"]
