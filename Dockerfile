@@ -1,6 +1,11 @@
 # Create pipenv image to convert Pipfile to requirements.txt
 FROM python:3.11-slim as pipenv
 
+# Labels
+LABEL maintainer="MrZablah" \
+			description="Sync Poster Process"
+LABEL org.opencontainers.image.source = "https://github.com/MrZablah/SyncPosterProcess"
+
 # Copy Pipfile and Pipfile.lock
 COPY Pipfile Pipfile.lock ./
 
