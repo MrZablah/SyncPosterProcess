@@ -21,6 +21,8 @@ class Config:
         # Load config into instance variables
         self.global_data = config['global']
         self.script_data = config.get(f'{self.script_name}', {})
+        self.run_now = self.global_data.get('run_now', False)  # Use False as default value for run_now if not provided
+        self.schedule_hour = self.global_data.get('schedule_hour', 5)  # Use '5' as default schedule_hour if not provided
         self.log_level = self.global_data.get('log_level', 'info').lower()  # Use 'info' as default log level if not provided
 
         # Global variables

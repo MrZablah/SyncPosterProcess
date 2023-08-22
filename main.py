@@ -38,21 +38,15 @@ async def run_tasks(run_now):
 
 # Create and run the asyncio event loop
 async def main():
-    # Read the value of the environment variable RUN_NOW, defaulting to False
-    run_now = os.getenv("RUN_NOW", "False").lower() == "true"
-
-    # Read the hour at which tasks should be scheduled from the environment, defaulting to 5 if not set
-    scheduled_hour = int(os.getenv("SCHEDULED_HOUR", "5"))
-
     # Run tasks immediately (if run_now is True)
-    await run_tasks(run_now)
+    await run_tasks(config.run_now)
 
     while True:
         # Get the current time
         now = datetime.now()
 
         # Calculate the next run time based on the specified hour
-        next_run = datetime(now.year, now.month, now.day, scheduled_hour, 0)
+        next_run = datetime(now.year, now.month, now.day, int(config.schedule_hour), 0)
 
         # If the next run time has already passed for today, set it for the same time tomorrow
         if now >= next_run:

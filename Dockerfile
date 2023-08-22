@@ -1,11 +1,6 @@
 # Create pipenv image to convert Pipfile to requirements.txt
 FROM python:3.11-slim as pipenv
 
-# Labels
-LABEL maintainer="MrZablah" \
-			description="Sync Poster Process"
-LABEL org.opencontainers.image.source = "https://github.com/MrZablah/SyncPosterProcess"
-
 # Copy Pipfile and Pipfile.lock
 COPY Pipfile Pipfile.lock ./
 
@@ -30,6 +25,9 @@ RUN apt-get update; \
 FROM python:3.11-slim
 LABEL maintainer="MrZablah" \
       description="Sync Poster Process"
+LABEL org.opencontainers.image.source = "https://github.com/MrZablah/SyncPosterProcess"
+LABEL org.opencontainers.image.authors = "MrZablah"
+LABEL org.opencontainers.image.title = "Sync Poster Process"
 
 # Set working directory, copy source into container
 WORKDIR /app
@@ -38,12 +36,9 @@ WORKDIR /app
 COPY --from=python-reqs /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 
 # Script environment variables
-ENV SPP_CONFIG=/config/config.yml
-ENV SCHEDULE_HOUR=5
-ENV RUN_NOW=true
-ENV TZ=America/Monterrey
-ENV SPP_CONFIG=/config/config.yml
 ENV XDG_CONFIG_HOME=/config
+ENV SPP_CONFIG=/config/config.yml
+ENV TZ=America/Monterrey
 
 # Delete setup files
 # Create user and group to run the container

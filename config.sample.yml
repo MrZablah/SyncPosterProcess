@@ -1,13 +1,11 @@
 # This is a sample config file for the python scripts
 # You can copy this file and rename it to config.yml
-# You can also rename the scripts to whatever you want, just make sure to update the config file to match
-# The config file is broken up into sections, each section is a script
-# Each script has a log_level and dry_run option
-# log_level can be: debug, info, warning, error, critical
-# dry_run can be true or false
+# The config file is broken up into sections, each section is a script except the global section
 # The rest of the options are script specific
 global:
-  log_level: info
+  run_now: true # If true it will run the script immediately, if false it will wait until the schedule_hour
+  schedule_hour: 5 # This is the hour of the day you want the script to run, it's based on a 24 hour clock and defaults to 5am
+  log_level: info # log_level can be: debug, info, warning, error, critical
   radarr:
     # name is the name of the radarr instance, this is used to reference the instance in other scripts
     - name: radarr_1
@@ -57,10 +55,11 @@ sync_gdrive:
 
 # The renamer script is used to rename your posters to match your Plex Collections and Media Folder names for Movies and TV Shows
 # This script is meant to be used in conjuction with Plex-Meta-Manager, however it can be used on it's own.
+# This is a script base of this one: https://github.com/Drazzilb08/userScripts
 renamer:
   run: true # If false it will skip this step
   # Options are 'true' or 'false'
-  dry_run: true
+  dry_run: true # dry_run can be true or false, if true it will not actually rename anything
   asset_folders: false
   # Options are 'Copy' or 'Move'
   action_type: move
@@ -97,6 +96,7 @@ renamer:
     - name: sonarr_2
 
 # The fix_border script is used to fix the border colour of posters that sync_gdrive script downloads.
+# This script is meant to be used in conjuction with Plex-Meta-Manager, however it can be used on it's own.
 # This is a script base of this one: https://github.com/listentofaze/mm2k-border-replacer/tree/main#mm2k-poster-border-colour-replacer
 fix_border:
   run: true # If false it will skip this step
