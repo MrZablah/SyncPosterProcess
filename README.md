@@ -152,6 +152,7 @@ fix_border:
   input_folder: /data/input # Where your posters are going to be coming from
   output_folder: /data/fix_posters # Where your posters are going to go
   border_color: none # This will remove the border of the image but you can also add a color to change th border to any hex color, Ej: '#000000'
+  resize: false # If true it will resize the poster to 1000x1500, this requires border_color to be set to a 'none'
 ```
 
 

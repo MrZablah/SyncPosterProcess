@@ -5,6 +5,7 @@ input_folder=""
 output_folder=""
 border_color="#000000"
 overwrite_existing=false
+resize=false
 verbose=false
 
 # Function to print usage information
@@ -15,16 +16,18 @@ print_usage() {
     echo "  -o <output_folder>: Specify the output folder."
     echo "  -c <border_color>: Specify the border color in hex format (e.g., #RRGGBB). Default: #000000"
     echo "  -x: Optional. Overwrite existing files/folders in the output directory."
+    echo "  -r: Optional. resize image when border removed."
     echo "  -v: Optional. Verbose mode. Show detailed output."
 }
 
 # Parse command line arguments
-while getopts ":i:o:c:xv" opt; do
+while getopts ":i:o:c:xrv" opt; do
     case $opt in
         i) input_folder="$OPTARG";;
         o) output_folder="$OPTARG";;
         c) border_color="$OPTARG";;
         x) overwrite_existing=true;;
+        r) resize=true;;
         v) verbose=true;;
         \?) echo "Invalid option: -$OPTARG" >&2; print_usage; exit 1;;
         :) echo "Option -$OPTARG requires an argument." >&2; print_usage; exit 1;;
@@ -84,7 +87,11 @@ find "$input_folder" -type f \( -iname "*.jpg" -o -iname "*.png" \) | while read
     border_color=`sed -e "s/^'//" -e "s/'$//" <<<$border_color`
 
     # Process the image using ImageMagick
-    if [ "$border_color" == "none" ]; then
+    echo $resize
+    echo [ "$resize" = true ]
+    if [ "$border_color" == "none" ] && [ "$resize" = true ]; then
+      convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 -resize 1000x1500^ -extent 1000x1500 "$output_path"
+    elif [ "$border_color" == "none" ]; then
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 "$output_path"
     else
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor $border_color -border 25x25 "$output_path"

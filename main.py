@@ -11,21 +11,21 @@ logger = setup_logger(config.log_level, "global")
 
 
 async def step_one():
-    logger.info("Step 1: Running")
+    logger.debug("Step 1: Running")
     sync_gdrive.main()
-    logger.info("Step 1: Finished")
+    logger.debug("Step 1: Finished")
 
 
 async def step_two():
-    logger.info("Step 2: Running")
+    logger.debug("Step 2: Running")
     renamer.main()
-    logger.info("Step 2: Finished")
+    logger.debug("Step 2: Finished")
 
 
 async def step_three():
-    logger.info("Step 3: Running")
+    logger.debug("Step 3: Running")
     fix_border.main()
-    logger.info("Step 3: Finished")
+    logger.debug("Step 3: Finished")
 
 
 # Run tasks immediately if run_now is True
@@ -54,7 +54,7 @@ async def main():
 
         # Calculate the number of seconds to wait until the next run
         wait_seconds = (next_run - now).total_seconds()
-        logger.info(f"Sleep duration: {wait_seconds}")
+        logger.info(f"Sleep duration in seconds: {wait_seconds}")
 
         await asyncio.sleep(wait_seconds)
 

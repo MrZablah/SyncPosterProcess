@@ -17,6 +17,8 @@ command = [
     '-x',
     '-v'
 ]
+if config.resize:
+    command.append('-r')
 logger.debug(f"Fix Border command with args: {command}")
 
 

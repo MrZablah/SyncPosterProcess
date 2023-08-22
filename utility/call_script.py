@@ -23,6 +23,6 @@ def call_script(command, logger):
 
         # Check the exit code to handle errors if needed
         if process.returncode != 0:
-            logger.info(f"Bash script returned a non-zero exit code: {process.returncode}")
+            logger.debug(f"Bash script returned a non-zero exit code: {process.returncode}")
     except subprocess.CalledProcessError as e:
         logger.error(f"Error running the Bash script: {e}")
