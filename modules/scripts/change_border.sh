@@ -71,7 +71,7 @@ processed_files=0
 find "$input_folder" -type f \( -iname "*.jpg" -o -iname "*.png" \) | while read -r input_file; do
     # Determine output path
     rel_path="${input_file#"$input_folder"}"
-    output_path="$output_folder/$rel_path"
+    output_path="$output_folder$rel_path"
 
     # Check if the output file already exists and overwrite_existing is false
     if [ "$overwrite_existing" = false ] && [ -f "$output_path" ]; then
@@ -87,8 +87,6 @@ find "$input_folder" -type f \( -iname "*.jpg" -o -iname "*.png" \) | while read
     border_color=`sed -e "s/^'//" -e "s/'$//" <<<$border_color`
 
     # Process the image using ImageMagick
-    echo $resize
-    echo [ "$resize" = true ]
     if [ "$border_color" == "none" ] && [ "$resize" = true ]; then
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 -resize 1000x1500^ -extent 1000x1500 "$output_path"
     elif [ "$border_color" == "none" ]; then
