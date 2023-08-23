@@ -1,9 +1,7 @@
-import pathlib
 import yaml
 import os
 
-base_dir = pathlib.Path(__file__).parent.parent
-config_path = os.getenv('SPP_CONFIG', f'{base_dir}/config.yml')
+config_path = os.getenv('SPP_CONFIG', '/config/config.yml')
 
 
 class Config:

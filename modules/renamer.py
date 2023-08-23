@@ -24,7 +24,7 @@ import os
 import re
 
 config = Config(script_name="renamer")
-logger = setup_logger(config.log_level, "renamer")
+logger = setup_logger(config.log_level, "spp")
 
 year_regex = re.compile(r"\((19|20)\d{2}\)")
 illegal_chars_regex = re.compile(r'[<>:"/\\|?*\x00-\x1f]+')

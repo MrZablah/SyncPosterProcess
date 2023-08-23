@@ -1,12 +1,11 @@
 import shlex
 import json
-from utility.logger import setup_logger, get_logger_file
+from utility.logger import setup_logger
 from utility.config import Config
 from utility.call_script import call_script
 
 config = Config(script_name="sync_gdrive")
-logger = setup_logger(config.log_level, "sync_gdrive")
-log_file = get_logger_file("sync_gdrive")
+logger = setup_logger(config.log_level, "spp")
 
 # Specify the Bash script file to run
 bash_script_file = './modules/scripts/rclone.sh'
@@ -24,6 +23,7 @@ logger.debug(f"RClone command with args: {command}")
 # Main function
 def main():
     if config.run:
+        logger.info("Running sync_gdrive")
         call_script(command, logger)
     else:
         logger.info("Skipping sync_gdrive.py")

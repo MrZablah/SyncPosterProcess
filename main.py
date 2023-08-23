@@ -1,5 +1,3 @@
-import os
-import schedule
 import asyncio
 from modules import sync_gdrive, renamer, fix_border
 from utility.logger import setup_logger
@@ -7,7 +5,7 @@ from utility.config import Config
 from datetime import datetime, timedelta
 
 config = Config(script_name="global")
-logger = setup_logger(config.log_level, "global")
+logger = setup_logger(config.log_level, "spp")
 
 
 async def step_one():
@@ -30,6 +28,7 @@ async def step_three():
 
 # Run tasks immediately if run_now is True
 async def run_tasks(run_now):
+    logger.debug(f"run_now: {run_now}")
     if run_now:
         await step_one()
         await step_two()
@@ -44,6 +43,7 @@ async def main():
     while True:
         # Get the current time
         now = datetime.now()
+        logger.debug(f"Current time: {now}")
 
         # Calculate the next run time based on the specified hour
         next_run = datetime(now.year, now.month, now.day, int(config.schedule_hour), 0)

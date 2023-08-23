@@ -38,6 +38,7 @@ COPY --from=python-reqs /usr/local/lib/python3.11/site-packages /usr/local/lib/p
 # Script environment variables
 ENV XDG_CONFIG_HOME=/config
 ENV SPP_CONFIG=/config/config.yml
+ENV SPP_LOGS=/config/logs
 ENV TZ=America/Monterrey
 
 # Delete setup files

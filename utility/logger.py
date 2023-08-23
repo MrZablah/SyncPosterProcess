@@ -2,32 +2,8 @@ import os
 import time
 import logging
 import logging.handlers
-import pathlib
 
-base_dir = pathlib.Path(__file__).parent.parent
-log_dir = f'{base_dir}/logs'
-
-
-def init_logger():
-    """
-    Initialize the logger.
-    :return: None
-    """
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
-
-def get_logger_file(script_name):
-    """
-    Load the logger.
-    :param script_name:
-    :return: file logger
-    """
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    today = time.strftime("%Y-%m-%d")
-    print(base_dir)
-    return f"{log_dir}/{script_name}_{today}.log"
+log_dir = os.getenv('SPP_LOGS', '/config/logs')
 
 
 def setup_logger(log_level, script_name):
@@ -40,7 +16,11 @@ def setup_logger(log_level, script_name):
     Returns:
         A logger object for logging messages.
     """
-    log_file = get_logger_file(script_name)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    today = time.strftime("%Y-%m-%d")
+    log_file = f"{log_dir}/{script_name}_{today}.log"
+
     logger = logging.getLogger()
     log_level = log_level.upper()
     if log_level == 'DEBUG':

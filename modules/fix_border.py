@@ -1,11 +1,10 @@
 import shlex
-from utility.logger import setup_logger, get_logger_file
+from utility.logger import setup_logger
 from utility.config import Config
 from utility.call_script import call_script
 
 config = Config(script_name="fix_border")
-logger = setup_logger(config.log_level, "fix_border")
-log_file = get_logger_file("fix_border")
+logger = setup_logger(config.log_level, "spp")
 
 # Specify the Bash script file to run
 bash_script_file = './modules/scripts/change_border.sh'
@@ -25,6 +24,7 @@ logger.debug(f"Fix Border command with args: {command}")
 # Main function
 def main():
     if config.run:
+        logger.info("Running fix_border")
         call_script(command, logger)
     else:
         logger.info("Skipping fix_border.py")
