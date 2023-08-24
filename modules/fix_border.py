@@ -16,8 +16,13 @@ command = [
     '-x',
     '-v'
 ]
+
+if config.bottom_only:
+    command.append('-b')
+
 if config.resize:
     command.append('-r')
+
 logger.debug(f"Fix Border command with args: {command}")
 
 

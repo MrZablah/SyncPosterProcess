@@ -20,7 +20,7 @@ class Config:
         self.global_data = config['global']
         self.script_data = config.get(f'{self.script_name}', {})
         self.run_now = self.global_data.get('run_now', False)  # Use False as default value for run_now if not provided
-        self.schedule_hour = self.global_data.get('schedule_hour', 5)  # Use '5' as default schedule_hour if not provided
+        self.schedule_hour = self.global_data.get('schedule_hour', 4)  # Use '4' as default schedule_hour if not provided
         self.log_level = self.global_data.get('log_level', 'info').lower()  # Use 'info' as default log level if not provided
 
         # Global variables
@@ -62,3 +62,4 @@ class Config:
         self.output_folder = self.script_data.get('output_folder', '')  # Use empty string as default value for output_folder if not provided
         self.border_color = self.script_data.get('border_color', '#000000')  # Use #000000 as default value for border_color if not provided
         self.resize = self.script_data.get('resize', False)  # Use False as default value for resize if not provided
+        self.bottom_only = self.script_data.get('bottom_only', False)  # Use False as default value for bottom_only if not provided
