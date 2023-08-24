@@ -1,0 +1,17 @@
+# Ignore everything
+*
+
+# Allow files and directories
+!/main.py
+!/start.sh
+!/Pipfile
+!/Pipfile.lock
+!/modules
+!/utility
+
+# Ignore unnecessary files inside allowed directories
+# This should go after the allowed directories
+**/*~
+**/*.log
+**/.DS_Store
+**/Thumbs.db
