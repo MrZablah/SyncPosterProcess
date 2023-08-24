@@ -56,7 +56,7 @@ The first part to change is the global section:
 ```yaml
 global:
   run_now: true # If true it will run the script immediately, if false it will wait until the schedule_hour
-  schedule_hour: 5 # This is the hour of the day you want the script to run, it's based on a 24 hour clock and defaults to 5am
+  schedule_hour: 4 # This is the hour of the day you want the script to run, it's based on a 24 hour clock and defaults to 4am
   log_level: info # log_level can be: debug, info, warning, error, critical
   radarr:
     # name is the name of the radarr instance, this is used to reference the instance in other scripts
@@ -153,6 +153,7 @@ fix_border:
   output_folder: /data/fix_posters # Where your posters are going to go
   border_color: none # This will remove the border of the image but you can also add a color to change th border to any hex color, Ej: '#000000'
   resize: false # If true it will resize the poster to 1000x1500, this requires border_color to be set to a 'none'
+  bottom_only: false # If true it will only keep the bottom border, this requires border_color to be set to a color Ej: '#000000'
 ```
 
 
