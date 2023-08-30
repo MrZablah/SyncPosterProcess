@@ -61,9 +61,9 @@ renamer:
   # Options are 'true' or 'false'
   dry_run: true # dry_run can be true or false, if true it will not actually rename anything
   asset_folders: false
-  # Options are 'Copy' or 'Move'
-  action_type: move
-  print_only_renames: true
+  # Options are 'copy', 'move' and 'hardlink'
+  action_type: copy
+  print_only_renames: false # If print_only_renames is True, then we don't want to print files that don't need to be renamed
   # Library names are used to match collections posters to the collections listed w/in Plex. Typically Movie Libraries are used
   library_names:
     - Movies
@@ -102,6 +102,7 @@ fix_border:
   run: true # If false it will skip this step
   input_folder: /data/input # Where your posters are going to be coming from
   output_folder: /data/fix_posters # Where your posters are going to go
-  border_color: none # This will remove the border of the image but you can also add a color to change th border to any hex color, Ej: '#000000'
+  border_color: none # This will remove the border of the image, but you can also add a color to change th border to any hex color, Ej: '#000000'
+  overwrite_existing: true # If true it will overwrite the existing poster, if false it will skip the poster
   resize: false # If true it will resize the poster to 1000x1500, this requires border_color to be set to a 'none'
   bottom_only: false # If true it will only keep the bottom border, this requires border_color to be set to a color Ej: '#000000'

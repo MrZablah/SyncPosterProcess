@@ -61,5 +61,6 @@ class Config:
         self.input_folder = self.script_data.get('input_folder', '')  # Use empty string as default value for input_folder if not provided
         self.output_folder = self.script_data.get('output_folder', '')  # Use empty string as default value for output_folder if not provided
         self.border_color = self.script_data.get('border_color', '#000000')  # Use #000000 as default value for border_color if not provided
+        self.overwrite_existing = self.script_data.get('overwrite_existing', True)  # Use False as default value for resize if not provided
         self.resize = self.script_data.get('resize', False)  # Use False as default value for resize if not provided
         self.bottom_only = self.script_data.get('bottom_only', False)  # Use False as default value for bottom_only if not provided

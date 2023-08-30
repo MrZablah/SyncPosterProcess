@@ -12,10 +12,11 @@ command = [
     bash_script_file,
     '-i', shlex.quote(config.input_folder),
     '-o', shlex.quote(config.output_folder),
-    '-c', shlex.quote(config.border_color),
-    '-x',
-    '-v'
+    '-c', shlex.quote(config.border_color)
 ]
+
+if config.overwrite_existing:
+    command.append('-x')
 
 if config.bottom_only:
     command.append('-b')
@@ -23,6 +24,8 @@ if config.bottom_only:
 if config.resize:
     command.append('-r')
 
+if config.log_level == 'debug':
+    command.append('-v')
 logger.debug(f"Fix Border command with args: {command}")
 
 
@@ -31,5 +34,6 @@ def main():
     if config.run:
         logger.info("Running fix_border")
         call_script(command, logger)
+        logger.info("Finished fix_border")
     else:
         logger.info("Skipping fix_border.py")

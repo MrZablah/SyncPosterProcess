@@ -9,21 +9,21 @@ logger = setup_logger(config.log_level, "spp")
 
 
 async def step_one():
-    logger.debug("Step 1: Running")
+    logger.debug("Step 1: ------------ Running ------------")
     sync_gdrive.main()
-    logger.debug("Step 1: Finished")
+    logger.debug("Step 1: ------------ Finished ------------")
 
 
 async def step_two():
-    logger.debug("Step 2: Running")
+    logger.debug("Step 2: ------------ Running ------------")
     renamer.main()
-    logger.debug("Step 2: Finished")
+    logger.debug("Step 2: ------------ Finished ------------")
 
 
 async def step_three():
-    logger.debug("Step 3: Running")
+    logger.debug("Step 3: ------------ Running ------------")
     fix_border.main()
-    logger.debug("Step 3: Finished")
+    logger.debug("Step 3: ------------ Finished ------------")
 
 
 # Run tasks immediately if run_now is True

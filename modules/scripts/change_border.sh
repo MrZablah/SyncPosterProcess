@@ -90,7 +90,6 @@ find "$input_folder" -type f \( -iname "*.jpg" -o -iname "*.png" \) | while read
     border_color=`sed -e "s/^'//" -e "s/'$//" <<<$border_color`
 
     # Process the image using ImageMagick
-    convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 "$output_path"
     if [ "$border_color" == "none" ] && [ "$resize" = true ]; then
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 -resize 1000x1500^ -extent 1000x1500 "$output_path"
     elif [ "$border_color" == "none" ]; then

@@ -17,8 +17,10 @@ command = [
     '-f', shlex.quote(config.gdrive_id),
     '-t', json.dumps(config.token)
 ]
-debug_cmd = command[0] = '<redacted>' if config.client_id else 'None'
-debug_cmd = command[1] = '<redacted>' if config.client_secret else 'None'
+debug_cmd = command.copy()
+debug_cmd[debug_cmd.index('-i') + 1] = '<redacted>' if config.client_id else 'None'
+debug_cmd[debug_cmd.index('-s') + 1] = '<redacted>' if config.client_secret else 'None'
+debug_cmd[debug_cmd.index('-t') + 1] = '<redacted>' if config.token else 'None'
 logger.debug(f"RClone command with args: {debug_cmd}")
 
 
@@ -27,5 +29,6 @@ def main():
     if config.run:
         logger.info("Running sync_gdrive")
         call_script(command, logger)
+        logger.info("Finished sync_gdrive")
     else:
         logger.info("Skipping sync_gdrive.py")

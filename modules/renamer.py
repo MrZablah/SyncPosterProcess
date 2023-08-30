@@ -309,10 +309,10 @@ def rename_file(matched_media, destination_dir, dry_run, action_type, print_only
                                     messages.append(f"Removed {i} from {destination_dir}")
                                     os.remove(os.path.join(destination_dir, i))
             if new_file_name != old_file_name:
-                messages.extend(process_file(old_file_name, new_file_name, action_type, dry_run, destination_file_path, source_file_path, '->'))
+                messages.extend(process_file(old_file_name, new_file_name, action_type, dry_run, destination_file_path, source_file_path, '-renamed->'))
             else:
                 if not print_only_renames:
-                    messages.extend(process_file(old_file_name, new_file_name, action_type, dry_run, destination_file_path, source_file_path, '-->>'))
+                    messages.extend(process_file(old_file_name, new_file_name, action_type, dry_run, destination_file_path, source_file_path, '-not-renamed->>'))
     return messages
 
 
