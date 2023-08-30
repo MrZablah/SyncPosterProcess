@@ -37,7 +37,7 @@ The recommend use of the script is to use the docker container provided in the
 [Docker Hub](https://hub.docker.com/r/mrzablah/spp) or [GHCR](https://github.com/MrZablah/SyncPosterProcess/pkgs/container/spp)
 and configure it as explain below, but you can also use the script directly.
 
-## Docker
+# Docker
 They are several ways to run the docker container, but the recommend way is to use the following command:
 ```bash
 docker run -d \
@@ -50,8 +50,10 @@ docker run -d \
 Keep in mind that you need to change the TZ variable to your timezone so you can se the schedule correctly,
 and the volumes to the path you want to use.
 
-## Configuration file
+# Configuration file
 The config file is where you will change all the settings for any of the scripts.
+
+## Global
 The first part to change is the global section:
 ```yaml
 global:
@@ -88,10 +90,13 @@ global:
       url: http://localhost:32400
 ```
 
+## Sync Google Drive
 There are sections for each of script,
 you can enable or disable any of the script with the `run` variable.
 
-### Sync Google Drive
+1. Get rclone client ID and Secret following these [instructions](https://rclone.org/drive/#making-your-own-client-id)
+2. Then get a token following these [instructions](https://rclone.org/remote_setup/)
+
 ```yaml
 sync_gdrive:
   run: true # If false it will skip this step
@@ -103,16 +108,16 @@ sync_gdrive:
   # Token looks like this: { "access_token": "value", "token_type": "Bearer", "refresh_token": "value", "expiry": "value" }
 ```
 
-### Renamer
+## Renamer
 ```yaml
 renamer:
   run: true # If false it will skip this step
   # Options are 'true' or 'false'
   dry_run: true # dry_run can be true or false, if true it will not actually rename anything
   asset_folders: false
-  # Options are 'Copy' or 'Move'
-  action_type: move
-  print_only_renames: true
+  # Options are 'copy' or 'move'
+  action_type: copy
+  print_only_renames: false # If print_only_renames is True, then we don't want to print files that don't need to be renamed
   # Library names are used to match collections posters to the collections listed w/in Plex. Typically Movie Libraries are used
   library_names:
     - Movies
@@ -145,13 +150,14 @@ renamer:
     - name: sonarr_2
 ```
 
-### Border Replacer
+## Border Replacer
 ```yaml
 fix_border:
   run: true # If false it will skip this step
   input_folder: /data/input # Where your posters are going to be coming from
   output_folder: /data/fix_posters # Where your posters are going to go
-  border_color: none # This will remove the border of the image but you can also add a color to change th border to any hex color, Ej: '#000000'
+  border_color: none # This will remove the border of the image, but you can also add a color to change th border to any hex color, Ej: '#000000'
+  overwrite_existing: true # If true it will overwrite the existing poster, if false it will skip the poster
   resize: false # If true it will resize the poster to 1000x1500, this requires border_color to be set to a 'none'
   bottom_only: false # If true it will only keep the bottom border, this requires border_color to be set to a color Ej: '#000000'
 ```
