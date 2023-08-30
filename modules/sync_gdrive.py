@@ -17,7 +17,9 @@ command = [
     '-f', shlex.quote(config.gdrive_id),
     '-t', json.dumps(config.token)
 ]
-logger.debug(f"RClone command with args: {command}")
+debug_cmd = command[0] = '<redacted>' if config.client_id else 'None'
+debug_cmd = command[1] = '<redacted>' if config.client_secret else 'None'
+logger.debug(f"RClone command with args: {debug_cmd}")
 
 
 # Main function
