@@ -96,7 +96,11 @@ find "$input_folder" -type f \( -iname "*.jpg" -o -iname "*.png" \) | while read
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 "$output_path"
     elif  [ "$border_color" != "none" ] &&[ "$bottom_only" = true ]; then
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 "$output_path"
-      convert "$output_path" -gravity south -background $border_color -splice 0x25 -resize 1000x1500^ "$output_path"
+      if [ "$resize" = true ]; then
+        convert "$output_path" -gravity south -background $border_color -splice 0x25 -resize 1000x1500^ "$output_path"
+      else
+        convert "$output_path" -gravity south -background $border_color -splice 0x25 "$output_path"
+      fi
     else
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor $border_color -border 25x25 "$output_path"
     fi
