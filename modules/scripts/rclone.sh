@@ -6,6 +6,7 @@ client_secret=""
 sync_location=""
 folder_id=""
 token=""
+gdrive_sa=""
 
 # Function to print usage information
 print_usage() {
@@ -15,24 +16,26 @@ print_usage() {
     echo "  -s <client_secret>: Specify the client secret."
     echo "  -l <sync_location>: Specify the sync location folder."
     echo "  -f <folder_id>: Specify the google drive folder id."
-    echo "  -t <token>: Specify the token."
+    echo "  -t <token>: OPTIONAL: Specify the token. not need if you have a service account."
+    echo "  -g <gdrive_sa>: OPTIONAL: Specify the google drive service account file location."
 }
 
 # Parse command line arguments
-while getopts ":i:s:l:f:t:" opt; do
+while getopts ":i:s:l:f:t:g:" opt; do
     case $opt in
         i) client_id="$OPTARG";;
         s) client_secret="$OPTARG";;
         l) sync_location="$OPTARG";;
         f) folder_id="$OPTARG";;
         t) token="$OPTARG";;
+        g) gdrive_sa="$OPTARG";;
         \?) echo "Invalid option: -$OPTARG" >&2; print_usage; exit 1;;
         :) echo "Option -$OPTARG requires an argument." >&2; print_usage; exit 1;;
     esac
 done
 
 # Check if required options are provided
-if [[ -z "$client_id" || -z "$client_secret" || -z "$sync_location" || -z "$folder_id" || -z "$token" ]]; then
+if [[ -z "$client_id" || -z "$client_secret" || -z "$sync_location" || -z "$folder_id" ]]; then
     echo "Error: Missing required options." >&2
     print_usage
     exit 1
@@ -47,6 +50,7 @@ rclone sync \
    --drive-client-secret "$client_secret" \
    --drive-token "$token" \
    --drive-root-folder-id "$folder_id" \
+   --drive-service-account-file "$gdrive_sa" \
    --fast-list \
    --tpslimit=5 \
    --no-update-modtime \

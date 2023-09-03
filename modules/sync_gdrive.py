@@ -14,14 +14,25 @@ command = [
     '-i', shlex.quote(config.client_id),
     '-s', shlex.quote(config.client_secret),
     '-l', shlex.quote(config.sync_location),
-    '-f', shlex.quote(config.gdrive_id),
-    '-t', json.dumps(config.token)
+    '-f', shlex.quote(config.gdrive_id)
 ]
+if config.token != {}:
+    command.append('-t')
+    command.append(json.dumps(config.token))
+
+if config.gdrive_sa_location != '':
+    command.append('-g')
+    command.append(shlex.quote(config.gdrive_sa_location))
+
 debug_cmd = command.copy()
 debug_cmd[debug_cmd.index('-i') + 1] = '<redacted>' if config.client_id else 'None'
 debug_cmd[debug_cmd.index('-s') + 1] = '<redacted>' if config.client_secret else 'None'
-debug_cmd[debug_cmd.index('-t') + 1] = '<redacted>' if config.token else 'None'
-logger.debug(f"RClone command with args: {debug_cmd}")
+
+if config.token != {}:
+    debug_cmd[debug_cmd.index('-t') + 1] = '<redacted>' if config.token else 'None'
+
+if config.run:
+    logger.debug(f"RClone command with args: {debug_cmd}")
 
 
 # Main function

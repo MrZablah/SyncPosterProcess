@@ -26,7 +26,9 @@ if config.resize:
 
 if config.log_level == 'debug':
     command.append('-v')
-logger.debug(f"Fix Border command with args: {command}")
+
+if config.run:
+    logger.debug(f"Fix Border command with args: {command}")
 
 
 # Main function

@@ -54,6 +54,7 @@ class Config:
         self.client_id = self.script_data.get('client_id', '')  # Use empty string as default value for client_id if not provided
         self.client_secret = self.script_data.get('client_secret', '')  # Use empty string as default value for client_secret if not provided
         self.sync_location = self.script_data.get('sync_location', '')  # Use empty string as default value for sync_location if not provided
+        self.gdrive_sa_location = self.script_data.get('gdrive_sa_location', '')  # Use empty string as default value for gdrive_sa_location if not provided
         self.gdrive_id = self.script_data.get('gdrive_id', '1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z')  # Use empty string as default value for gdrive_id if not provided
         self.token = self.script_data.get('token', {})  # Use empty dict if token data is not found
 

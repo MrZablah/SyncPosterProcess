@@ -322,7 +322,7 @@ def process_file(old_file_name, new_file_name, action_type, dry_run, destination
         if action_type == 'copy':
             if os.path.isfile(destination_file_path):
                 if filecmp.cmp(source_file_path, destination_file_path):
-                    logger.debug(f"Copy: File already exists: {destination_file_path}")
+                    logger.debug(f"Copy -> File already exists: {destination_file_path}")
                     pass
                 else:
                     output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
@@ -331,7 +331,7 @@ def process_file(old_file_name, new_file_name, action_type, dry_run, destination
         if action_type == 'hardlink':
             if os.path.isfile(destination_file_path):
                 if filecmp.cmp(source_file_path, destination_file_path):
-                    logger.debug(f"Hardlink: File already exists: {destination_file_path}")
+                    logger.debug(f"Hardlink -> File already exists: {destination_file_path}")
                     pass
                 else:
                     output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
@@ -344,7 +344,7 @@ def process_file(old_file_name, new_file_name, action_type, dry_run, destination
             try:
                 if os.path.isfile(destination_file_path):
                     if filecmp.cmp(source_file_path, destination_file_path):
-                        logger.debug(f"Copy: File already exists: {destination_file_path}")
+                        logger.debug(f"Copy -> File already exists: {destination_file_path}")
                         pass
                     else:
                         shutil.copyfile(source_file_path, destination_file_path)
@@ -367,7 +367,7 @@ def process_file(old_file_name, new_file_name, action_type, dry_run, destination
             except OSError as e:
                 if e.errno == errno.EEXIST:
                     if os.path.samefile(source_file_path, destination_file_path):
-                        logger.debug(f"Hardlink: File already exists: {destination_file_path}")
+                        logger.debug(f"Hardlink -> File already exists: {destination_file_path}")
                         pass
                     else:
                         os.replace(destination_file_path, source_file_path)

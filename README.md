@@ -104,8 +104,9 @@ sync_gdrive:
   client_secret: GOCSPX-asda123 # Client Secret for rclone, usually starts with GOCSPX-
   sync_location: /data/input # Where you want to sync the posters to
   gdrive_id: 1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z # The ID of the folder you want to sync from
-  token: # The token for rclone, this is the output of rclone config dump that needs to run manually
+  token: # The token for rclone, this is the output of rclone config dump that needs to run manually, it's not needed if you have a service account
   # Token looks like this: { "access_token": "value", "token_type": "Bearer", "refresh_token": "value", "expiry": "value" }
+  gdrive_sa_location: /config/rclone_sa.json # The location of your rclone service account file (JSON), id this is added token will be ignored
 ```
 
 ## Renamer
