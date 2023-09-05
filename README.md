@@ -97,6 +97,19 @@ you can enable or disable any of the script with the `run` variable.
 1. Get rclone client ID and Secret following these [instructions](https://rclone.org/drive/#making-your-own-client-id)
 2. Then get a token following these [instructions](https://rclone.org/remote_setup/)
 
+> Alternative use Google Cloud Service Account instead of token:
+- Creating and using this option will make it, so you don't need to create the token manually but I will still strongly
+  recommend to still add the Client ID and Client Secret and just change the token to SA, otherwise you might reach some limits.
+
+> Instructions for creating a Google Cloud Service Account
+1. To create a service account and obtain its credentials, go to the [Google Developer Console](https://console.developers.google.com/).
+2. You must have a project - create one if you don't.
+3. Then go to "IAM & admin" -> "Service Accounts".
+4. Use the "Create Service Account" button. Fill in "Service account name" and "Service account ID" with something that identifies your client.
+5. Select "Create And Continue". Step 2 and 3 are optional.
+6. Once created you will need to go to the Actions of the SA -> Manage Keys and create a JSON key and saved it as a file.
+7. These credentials are what rclone will use for authentication. If you ever need to remove access, press the "Delete service account key" button.
+
 ```yaml
 sync_gdrive:
   run: true # If false it will skip this step
