@@ -35,12 +35,8 @@ global:
       # url is the url for the plex instance
       url: http://localhost:32400
 
-# THIS SCRIPT SYNCS DRAZZILB GDRIVE POSTERS TO A LOCAL FOLDER. ANYTHING UNIQUE IN THE FOLDER WILL BE DELETED.
-# DRAZZ UPDATES POSTERS WEEKLY FROM TPDB MUSIKMANN2000
-#    1. Get an rclone client ID and Secret following these instructions:
-#    https://rclone.org/drive/#making-your-own-client-id
-#    2. Then get a token following these instructions:
-#    https://rclone.org/remote_setup/
+# THIS SCRIPT SYNCS GDRIVE TO A LOCAL FOLDER. ANYTHING UNIQUE IN THE FOLDER WILL BE DELETED.
+# -> You can use client_id, client_secret, and token to authenticate, or you can use gdrive_sa_location to use a service account.
 # DRAZZILB GDRIVE ID: 1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z
 # This script is meant to be used in conjuction with Plex-Meta-Manager, however it can be used on it's own.
 # This is a script base of this one: https://discord.com/channels/492590071455940612/1124032073557086258/1126226814629576858
@@ -48,11 +44,14 @@ sync_gdrive:
   run: true # If false it will skip this step
   client_id: asdasds.apps.googleusercontent.com # Client ID for rclone usually ends with .apps.googleusercontent.com
   client_secret: GOCSPX-asda123 # Client Secret for rclone, usually starts with GOCSPX-
-  sync_location: /data/input # Where you want to sync the posters to
-  gdrive_id: 1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z # The ID of the folder you want to sync from
   token: # The token for rclone, this is the output of rclone config dump that needs to run manually
   # Token looks like this: { "access_token": "value", "token_type": "Bearer", "refresh_token": "value", "expiry": "value" }
   gdrive_sa_location: /config/rclone_sa.json # The location of your rclone service account file (JSON)
+  gdrive_sync: # example of multiple gdrive_id's with multiple sync_locations as objects, we have deprecated gdrive_id and sync_location so please use this instead
+    - id: 1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z # The ID of the folder you want to sync from
+      location: /data/input # Where you want to sync the posters to
+    - id: 1wrSru-46iIN1iqCl2Cjhj5ofdazPgbsz # The ID of the folder you want to sync from
+      location: /data/input2 # Where you want to sync the posters to
 
 # The renamer script is used to rename your posters to match your Plex Collections and Media Folder names for Movies and TV Shows
 # This script is meant to be used in conjuction with Plex-Meta-Manager, however it can be used on it's own.

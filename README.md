@@ -45,10 +45,25 @@ docker run -d \
     -v /path/to/config:/config \
     -v /path/to/data:/data \
     -e TZ=America/Monterrey \
+    -e PUID=100 \
+    -e PGID=99 \
+    -e UMASK=000 \
     mrzablah/spp:latest
 ```
 Keep in mind that you need to change the TZ variable to your timezone so you can se the schedule correctly,
 and the volumes to the path you want to use.
+
+## Parameters
+
+Container images are configured using parameters passed at runtime (such as those above).
+
+|         Parameter         | Function                                                                                                       |
+|:-------------------------:|----------------------------------------------------------------------------------------------------------------|
+|      `-e PUID=1000`       | for UserID - see below for explanation                                                                         |
+|       `-e PGID=99`        | for GroupID - see below for explanation                                                                        |
+| `-e TZ=America/Monterrey` | specify a timezone to use, see this [list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List). |
+|       `-v /config`        | where the config.yml file will be                                                                              |
+|        `-v /data`         | Paths to saved the images. You can add as many as you need e.g. `/raw_posters`, `/renamer`, etc.               |
 
 # Configuration file
 The config file is where you will change all the settings for any of the scripts.
@@ -110,16 +125,21 @@ you can enable or disable any of the script with the `run` variable.
 6. Once created you will need to go to the Actions of the SA -> Manage Keys and create a JSON key and saved it as a file.
 7. These credentials are what rclone will use for authentication. If you ever need to remove access, press the "Delete service account key" button.
 
+> As a fallback you can use sync_location and gdrive_id, but this is deprecated and will be removed in the future.
 ```yaml
 sync_gdrive:
   run: true # If false it will skip this step
   client_id: asdasds.apps.googleusercontent.com # Client ID for rclone usually ends with .apps.googleusercontent.com
   client_secret: GOCSPX-asda123 # Client Secret for rclone, usually starts with GOCSPX-
-  sync_location: /data/input # Where you want to sync the posters to
-  gdrive_id: 1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z # The ID of the folder you want to sync from
-  token: # The token for rclone, this is the output of rclone config dump that needs to run manually, it's not needed if you have a service account
+  token: # The token for rclone, this is the output of rclone config dump that needs to run manually
   # Token looks like this: { "access_token": "value", "token_type": "Bearer", "refresh_token": "value", "expiry": "value" }
-  gdrive_sa_location: /config/rclone_sa.json # The location of your rclone service account file (JSON), id this is added token will be ignored
+  gdrive_sa_location: /config/rclone_sa.json # The location of your rclone service account file (JSON)
+  # we have deprecated gdrive_id and sync_location so please use this instead
+  gdrive_sync: # example of multiple gdrive_id's with multiple sync_locations as objects
+    - id: 1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z # The ID of the folder you want to sync from
+      location: /data/input # Where you want to sync the posters to
+    - id: 1wrSru-46iIN1iqCl2Cjhj5ofdazPgbsz # The ID of the folder you want to sync from
+      location: /data/input2 # Where you want to sync the posters to
 ```
 
 ## Renamer

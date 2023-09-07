@@ -91,12 +91,16 @@ find "$input_folder" -type f \( -iname "*.jpg" -o -iname "*.png" \) | while read
 
     # Process the image using ImageMagick
     if [ "$border_color" == "none" ] && [ "$resize" = true ]; then
+      verbose_echo "Remove border and resize image."
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 -resize 1000x1500^ -extent 1000x1500 "$output_path"
     elif [ "$border_color" == "none" ]; then
+      verbose_echo "Remove border."
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 "$output_path"
-    elif  [ "$border_color" != "none" ] &&[ "$bottom_only" = true ]; then
+    elif  [ "$border_color" != "none" ] && [ "$bottom_only" = true ]; then
+      verbose_echo "Remove border and add bottom border."
       convert "$input_file" -gravity center -crop "$(identify -format '%[fx:w-50]x%[fx:h-50]+0+0' "$input_file")" -bordercolor none -border 0 "$output_path"
       if [ "$resize" = true ]; then
+        verbose_echo "Resize image."
         convert "$output_path" -gravity south -background $border_color -splice 0x25 -resize 1000x1500^ "$output_path"
       else
         convert "$output_path" -gravity south -background $border_color -splice 0x25 "$output_path"
@@ -106,11 +110,11 @@ find "$input_folder" -type f \( -iname "*.jpg" -o -iname "*.png" \) | while read
     fi
     verbose_echo "Processed: $output_path"
 
-    processed_files=$((processed_files + 1))
-    if [ "$verbose" = false ]; then
-        progress=$((processed_files * 100 / total_files))
-        printf "Processing: [%3d%%]\r" "$progress"
-    fi
+#    processed_files=$((processed_files + 1))
+#    if [ "$verbose" = false ]; then
+#        progress=$((processed_files * 100 / total_files))
+#        printf "Processing: [%3d%%]\r" "$progress"
+#    fi
 done
 
 if [ "$verbose" = false ]; then

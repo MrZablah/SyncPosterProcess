@@ -34,12 +34,12 @@ while getopts ":i:s:l:f:t:g:" opt; do
     esac
 done
 
-# Check if required options are provided
-if [[ -z "$client_id" || -z "$client_secret" || -z "$sync_location" || -z "$folder_id" ]]; then
-    echo "Error: Missing required options." >&2
-    print_usage
-    exit 1
-fi
+## Check if required options are provided
+#if [[ -z "$client_id" || -z "$client_secret" || -z "$sync_location" || -z "$folder_id" ]]; then
+#    echo "Error: Missing required options." >&2
+#    print_usage
+#    exit 1
+#fi
 
 #This creates a blank rclone google drive remote named "posters" we'll use for this command.
 rclone config create posters drive config_is_local=false >&2
