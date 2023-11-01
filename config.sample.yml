@@ -4,7 +4,7 @@
 # The rest of the options are script specific
 global:
   run_now: true # If true it will run the script immediately, if false it will wait until the schedule_hour
-  schedule_hour: 4 # This is the hour of the day you want the script to run, it's based on a 24 hour clock and defaults to 4am
+  schedule_hour: 4 # This is the hour of the day you want the script to run, it's based on a 24 hour clock and defaults to 4am. Set to -1 to disable scheduling and quit after running.
   log_level: info # log_level can be: debug, info, warning, error, critical
   radarr:
     # name is the name of the radarr instance, this is used to reference the instance in other scripts
