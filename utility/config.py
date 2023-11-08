@@ -41,7 +41,7 @@ class Config:
 
         # Renamer variables
         self.use_plex = self.script_data.get('use_plex', False)  # Use False as default value for use_plex if not provided
-        self.source_dir = self.script_data.get('source_dirs', [])  # Use an empty list as default value for source_dir if not provided
+        self.source_dir = self.script_data.get('source_dir', [])  # Use an empty list as default value for source_dir if not provided
         self.source_overrides = self.script_data.get('source_overrides', [])  # Use an empty list as default value for source_override if not provided
         self.destination_dir = self.script_data.get('destination_dir', '')  # Use empty string as default value for destination_dir if not provided
         self.movies_threshold = self.script_data.get('movies_threshold', 0)  # Use 0 as default value for movies_threshold if not provided
