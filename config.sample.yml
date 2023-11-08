@@ -41,7 +41,7 @@ global:
 # This script is meant to be used in conjuction with Plex-Meta-Manager, however it can be used on it's own.
 # This is a script base of this one: https://discord.com/channels/492590071455940612/1124032073557086258/1126226814629576858
 sync_gdrive:
-  run: true # If false it will skip this step
+  run: true # If false, it will skip this step
   client_id: asdasds.apps.googleusercontent.com # Client ID for rclone usually ends with .apps.googleusercontent.com
   client_secret: GOCSPX-asda123 # Client Secret for rclone, usually starts with GOCSPX-
   token: # The token for rclone, this is the output of rclone config dump that needs to run manually
@@ -57,7 +57,7 @@ sync_gdrive:
 # This script is meant to be used in conjuction with Plex-Meta-Manager, however it can be used on it's own.
 # This is a script base of this one: https://github.com/Drazzilb08/userScripts
 renamer:
-  run: true # If false it will skip this step
+  run: true # If false, it will skip this step
   # Options are 'true' or 'false'
   dry_run: true # dry_run can be true or false, if true it will not actually rename anything
   asset_folders: false
@@ -70,8 +70,11 @@ renamer:
     - TV Shows
     - Anime Movies
   # Where your ingest movies folder is (THe source and destination should not be the same directory)
-  source_dir: /path/to/posters/ <--- Lowest priority
-  # What posters you'd like to override the souce dir with. This dir will take priority for assets over source_dir
+  # The order of the source dirs matters
+  # Can be a single dir or a list of dirs
+  source_dirs: /path/to/posters/ <--- Lowest priority
+  # What posters you'd like to override the source dirs with.
+  # This dir will take priority for assets over source_dirs
   # To not use any override, simply leave it blank or remove it from the config
   # Can be a single dir or a list of dirs
   source_overrides:
@@ -99,10 +102,46 @@ renamer:
 # This script is meant to be used in conjuction with Plex-Meta-Manager, however it can be used on it's own.
 # This is a script base of this one: https://github.com/listentofaze/mm2k-border-replacer/tree/main#mm2k-poster-border-colour-replacer
 fix_border:
-  run: true # If false it will skip this step
+  run: true # If false, it will skip this step
   input_folder: /data/input # Where your posters are going to be coming from
   output_folder: /data/fix_posters # Where your posters are going to go
   border_color: none # This will remove the border of the image, but you can also add a color to change th border to any hex color, Ej: '#000000'
   overwrite_existing: true # If true it will overwrite the existing poster, if false it will skip the poster
   resize: false # If true it will resize the poster to 1000x1500, this requires border_color to be set to a 'none'
   bottom_only: false # If true it will only keep the bottom border, this requires border_color to be set to a color Ej: '#000000'
+
+# This is a script that will take your existing collections, Movies, and Series, and match them to your Plex Library and/or your Media Dir
+unmatched_assets:
+  run: true # If false, it will skip this step
+  # Optional: Add libraries you want the script to check for unmatched assets
+  asset_folders: false
+  library_names:
+    - Movies
+    - Anime Movies
+  # Optional: Add collections you'd like to ignore
+  # These defaults are based upon my own usecase, you can remove them or add your own
+  ignore_collections:
+    - "Star Wars Universe"
+    - "DC Animated Universe"
+    - "Alien / Predator"
+    - "Rocky / Creed"
+    - "MonsterVerse"
+    - "Star Trek"
+    - "X-Men Universe"
+    - "In Association With Marvel"
+    - "View Askewniverse"
+    - "The Mummy Universe"
+    - "Middle Earth"
+    - "In Association With DC"
+    - "Wizarding World"
+    - "Fast & Furious"
+    - "The Spiderverse"
+    - "Marvel Cinematic Universe"
+    - "The Conjuring Universe"
+    - "The Batman Universe"
+    - "Collectionless"
+    - "DC Extended Universe"
+  assets_path: /path/to/poster-assets/
+  media_paths:
+    - /path/to/media/folders/movies
+    - /path/to/media/folders/tv-shows

@@ -1,5 +1,5 @@
 import asyncio
-from modules import sync_gdrive, renamer, fix_border
+from modules import sync_gdrive, renamer, fix_border, unmatched_assets
 from utility.logger import setup_logger
 from utility.config import Config
 from datetime import datetime, timedelta
@@ -26,6 +26,12 @@ async def step_three():
     logger.debug("Step 3: ------------ Finished ------------")
 
 
+async def step_four():
+    logger.debug("Step 3: ------------ Running ------------")
+    unmatched_assets.main()
+    logger.debug("Step 3: ------------ Finished ------------")
+
+
 # Run tasks immediately if run_now is True
 async def run_tasks(run_now):
     logger.debug(f"run_now: {run_now}")
@@ -33,6 +39,7 @@ async def run_tasks(run_now):
         await step_one()
         await step_two()
         await step_three()
+        await step_four()
 
 
 # Create and run the asyncio event loop

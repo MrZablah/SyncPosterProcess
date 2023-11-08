@@ -2,26 +2,26 @@
 # Name: renamer.py
 # Description: This script will check for unmatched assets in your Plex library.
 #              It will output the results to a file in the logs folder.
-# This is a modified version of the original script by Drazzilb
+# This is a modified version of the original script by Drazzilb, Version: 5.2.0
 # you can find the original script here: https://github.com/Drazzilb08/userScripts/blob/master/python-scripts/renamer.py
 # ===================================================================================================
 
-from plexapi.exceptions import BadRequest
-from utility.logger import setup_logger
-from plexapi.server import PlexServer
-from utility.config import Config
-from utility.arrpy import StARR
-from unidecode import unidecode
-from fuzzywuzzy import process
 from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+from plexapi.exceptions import BadRequest
+from plexapi.server import PlexServer
 from tqdm import tqdm
-import filecmp
-import shutil
+from unidecode import unidecode
+from utility.arrpy import StARR
+from utility.config import Config
+from utility.logger import setup_logger
 import errno
-import json
+import filecmp
 import html
+import json
 import os
 import re
+import shutil
 
 config = Config(script_name="renamer")
 logger = setup_logger(config.log_level, "spp")
@@ -452,14 +452,22 @@ def sort_files(files, path, dict, basename):
     return dict
 
 
-def get_assets_files(assets_path, override_paths):
+def get_assets_files(assets_paths, override_paths):
     asset_files = {"series": [], "movies": [], "collections": []}
     override_files = {"series": [], "movies": [], "collections": []}
     asset_types = ['series', 'movies', 'collections']
-    if assets_path:
-        files = get_files(assets_path)
-        basename = os.path.basename(assets_path.rstrip('/'))
-        asset_files = sort_files(files, assets_path, asset_files, basename)
+    if isinstance(assets_paths, str):
+        assets_paths = [assets_paths]
+    if assets_paths:
+        for paths in assets_paths:
+            files = get_files(paths)
+            basename = os.path.basename(paths.rstrip('/'))
+            asset_files = sort_files(files, paths, asset_files, basename)
+        # clean up duplicates on asset_files before processing overrides
+        # NOTE: Check this code
+        for asset_types in asset_files:
+            seen = set()
+            asset_files[asset_types] = [x for x in asset_files[asset_types] if not (x['title'] in seen or seen.add(x['title']))]
     if isinstance(override_paths, str):
         override_paths = [override_paths]
     if override_paths:
@@ -571,6 +579,7 @@ def main():
     logger.debug(f"print_only_renames: {config.print_only_renames}")
     logger.debug(f'*' * 40)
     logger.debug('')
+
     if config.dry_run:
         logger.info('*' * 40)
         logger.info(f'* {"Dry_run Activated":^36} *')
@@ -578,7 +587,9 @@ def main():
         logger.info(f'* {" NO CHANGES WILL BE MADE ":^36} *')
         logger.info('*' * 40)
         logger.info('')
-    asset_files = get_assets_files(config.source_dir, config.source_overrides)
+
+    asset_files = get_assets_files(config.source_dirs, config.source_overrides)
+
     instance_data = {
         'Plex': config.plex_data,
         'Radarr': config.radarr_data,
