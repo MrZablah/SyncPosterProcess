@@ -47,6 +47,10 @@ async def main():
     # Run tasks immediately (if run_now is True)
     await run_tasks(config.run_now)
 
+    if int(config.schedule_hour == -1):
+        logger.debug("scheduling disabled. exit")
+        return
+
     while True:
         # Get the current time
         now = datetime.now()
