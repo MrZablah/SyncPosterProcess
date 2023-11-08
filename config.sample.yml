@@ -73,7 +73,6 @@ renamer:
     - TV Shows
     - Anime Movies
   # Where your ingest movies folder is (The source and destination should not be the same directory)
-  # Can be a single dir or a list of dirs
   source_dir: /path/to/posters/ <--- Lowest priority
   # What posters you'd like to override the source dirs with.
   # This dir will take priority for assets over source_dir
