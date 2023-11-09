@@ -2,26 +2,26 @@
 # Name: renamer.py
 # Description: This script will check for unmatched assets in your Plex library.
 #              It will output the results to a file in the logs folder.
-# This is a modified version of the original script by Drazzilb
+# This is a modified version of the original script by Drazzilb, Version: 5.3.4
 # you can find the original script here: https://github.com/Drazzilb08/userScripts/blob/master/python-scripts/renamer.py
 # ===================================================================================================
 
-from plexapi.exceptions import BadRequest
-from utility.logger import setup_logger
-from plexapi.server import PlexServer
-from utility.config import Config
-from utility.arrpy import StARR
-from unidecode import unidecode
-from fuzzywuzzy import process
 from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+from plexapi.exceptions import BadRequest
+from plexapi.server import PlexServer
 from tqdm import tqdm
-import filecmp
-import shutil
+from unidecode import unidecode
+from utility.arrpy import StARR
+from utility.config import Config
+from utility.logger import setup_logger
 import errno
-import json
+import filecmp
 import html
+import json
 import os
 import re
+import shutil
 
 config = Config(script_name="renamer")
 logger = setup_logger(config.log_level, "spp")
@@ -71,9 +71,10 @@ def match_collection(plex_collections, source_file_list, collection_threshold):
     not_matched = {"not_matched": []}
     for plex_collection in tqdm(plex_collections, desc="Matching collections", total=len(plex_collections), disable=None):
         plex_normalize_title = normalize_titles(plex_collection)
-        matches = []
-        matches.append(process.extract(plex_collection, [item['title'] for item in source_file_list['collections']], scorer=fuzz.ratio))
-        matches.append(process.extract(plex_normalize_title, [item['normalized_title'] for item in source_file_list['collections']], scorer=fuzz.ratio))
+        matches = [
+            process.extract(plex_collection, [item['title'] for item in source_file_list['collections']], scorer=fuzz.ratio),
+            process.extract(plex_normalize_title, [item['normalized_title'] for item in source_file_list['collections']], scorer=fuzz.ratio)
+        ]
         for prefix in prefixes:
             matches.append(process.extract(plex_collection, [re.sub(rf"^{prefix}\s(?=\S)", '', item['title']) for item in source_file_list['collections']], scorer=fuzz.ratio))
             matches.append(process.extract(plex_normalize_title, [re.sub(rf"^{prefix}\s(?=\S)", '', item['normalized_title']) for item in source_file_list['collections']], scorer=fuzz.ratio))
@@ -160,17 +161,30 @@ def match_collection(plex_collections, source_file_list, collection_threshold):
     return matched_collections
 
 
-def match_media(media, source_file_list, threshold, type):
+def match_media(media, source_file_list, type):
     matched_media = {"matched_media": []}
     not_matched = {"not_matched": []}
     for item in tqdm(media, desc="Matching media", total=len(media), disable=None):
         alternate_title = False
         alternate_titles = []
+        normalized_alternate_titles = []
         arr_title = item['title']
+        arr_path = os.path.basename(item['path'])
+        arr_path = year_regex.sub("", arr_path).strip()
+        normalized_arr_path = normalize_titles(arr_path)
+        try:
+            arr_path_year = year_regex.search(item['path'])
+            arr_path_year = int(arr_path_year.group(0)[1:-1])
+        except AttributeError:
+            if item['status'] == 'upcoming' or item['status'] == 'announced':
+                continue
+            else:
+                logger.warning(f"Unable to find year in path: {item['path']}")
         try:
             if item['alternateTitles']:
                 for i in item['alternateTitles']:
                     alternate_titles.append(i['title'])
+                    normalized_alternate_titles.append(normalize_titles(i['title']))
         except KeyError:
             alternate_titles = []
         year_from_title = year_regex.search(item['title'])
@@ -197,32 +211,56 @@ def match_media(media, source_file_list, threshold, type):
             file_normalized_title = i['normalized_title']
             files = i['files']
             file_year = i['year']
-            if (arr_title == file_title or arr_normalized_title == file_normalized_title) and (
-                    arr_year == file_year or secondary_year == file_year
+            if (
+                    arr_title == file_title or
+                    arr_normalized_title == file_normalized_title or
+                    arr_path == file_title or
+                    normalized_arr_path == file_normalized_title or
+                    file_title in alternate_titles or
+                    file_normalized_title in normalized_alternate_titles
+            ) and (
+                    arr_year == file_year or
+                    secondary_year == file_year or
+                    arr_path_year == file_year
             ):
                 matched_media['matched_media'].append({
                     "title": file_title,
                     "normalized_title": file_normalized_title,
                     "arr_title": arr_title,
                     "arr_normalized_title": arr_normalized_title,
+                    "arr_path": arr_path,
+                    "normalized_arr_path": normalized_arr_path,
                     "year": file_year,
                     "arr_year": arr_year,
+                    "arr_path_year": arr_path_year,
                     "secondaryYear": secondary_year,
                     "files": files,
                     "alternate_title": alternate_title,
                     "folder": folder,
                 })
                 break
-            elif (arr_title == file_title or arr_normalized_title == file_normalized_title) and (
-                    arr_year != file_year or secondary_year != file_year
+            elif (
+                    arr_title == file_title or
+                    arr_normalized_title == file_normalized_title or
+                    arr_path == file_title or
+                    normalized_arr_path == file_normalized_title or
+                    file_title in alternate_titles or
+                    file_normalized_title in normalized_alternate_titles
+            ) and (
+                    arr_year != file_year or
+                    secondary_year != file_year or
+                    arr_path_year != file_year
             ):
                 not_matched['not_matched'].append({
                     "title": file_title,
                     "normalized_title": file_normalized_title,
                     "arr_title": arr_title,
                     "arr_normalized_title": arr_normalized_title,
+                    "arr_path": arr_path,
+                    "normalized_arr_path": normalized_arr_path,
                     "year": file_year,
                     "arr_year": arr_year,
+                    "arr_path_year": arr_path_year,
                     "secondaryYear": secondary_year,
                     "files": files,
                     "alternate_title": alternate_title,
@@ -527,9 +565,9 @@ def process_instance(instance_type, instance_name, url, api, final_output, asset
     if instance_type == "Plex":
         matched_media = match_collection(collection_names, asset_files, config.collection_threshold)
     elif instance_type == "Radarr":
-        matched_media = match_media(media, asset_files, config.movies_threshold, "movies")
+        matched_media = match_media(media, asset_files, "movies")
     elif instance_type == "Sonarr":
-        matched_media = match_media(media, asset_files, config.series_threshold, "series")
+        matched_media = match_media(media, asset_files, "series")
     if matched_media:
         message = rename_file(matched_media, config.destination_dir, config.dry_run, config.action_type, config.print_only_renames)
         final_output.extend(message)
@@ -564,13 +602,12 @@ def main():
     logger.debug(f"source_dir: {config.source_dir}")
     logger.debug(f"source_overrides: {config.source_overrides}")
     logger.debug(f"destination_dir: {config.destination_dir}")
-    logger.debug(f"movies_threshold: {config.movies_threshold}")
-    logger.debug(f"series_threshold: {config.series_threshold}")
     logger.debug(f"collection_threshold: {config.collection_threshold}")
     logger.debug(f"action_type: {config.action_type}")
     logger.debug(f"print_only_renames: {config.print_only_renames}")
     logger.debug(f'*' * 40)
     logger.debug('')
+
     if config.dry_run:
         logger.info('*' * 40)
         logger.info(f'* {"Dry_run Activated":^36} *')
@@ -578,7 +615,9 @@ def main():
         logger.info(f'* {" NO CHANGES WILL BE MADE ":^36} *')
         logger.info('*' * 40)
         logger.info('')
+
     asset_files = get_assets_files(config.source_dir, config.source_overrides)
+
     instance_data = {
         'Plex': config.plex_data,
         'Radarr': config.radarr_data,
