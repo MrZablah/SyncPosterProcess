@@ -72,28 +72,22 @@ renamer:
     - Movies
     - TV Shows
     - Anime Movies
-  # Where your ingest movies folder is (The source and destination should not be the same directory)
+  # Where your ingest movies folder is (THe source and destination should not be the same directory)
   source_dir: /path/to/posters/ <--- Lowest priority
-  # What posters you'd like to override the source dirs with.
-  # This dir will take priority for assets over source_dir
-  # To not use any override, leave it blank or remove it from the config
+  # What posters you'd like to override the souce dir with. This dir will take priority for assets over source_dir
+  # To not use any override, simply leave it blank or remove it from the config
   # Can be a single dir or a list of dirs
   source_overrides:
     - /path/to/posters/override/ <--- Middle priority
     - /path/to/posters/override2/ <--- Highest priority
-  # Where your posters are going to go.
-  # In my use case, I use Plex-Meta-Manager.
-  # This is the /config/assets dir for PMM for me.
+  # Where your posters are going to go. In my usecase I use Plex-Meta-Manager. This is the /config/assets dir for PMM for me.
   destination_dir: /path/to/poster/destination
-  # The thresholds are used to consider what is a "Match",
-  # As with any automation, there is never a 100% guarantee of accuracy.
-  # There will be times that script will mess up.
-  # If, however, you see it messing up more often on things, you can restrict the threshold.
+  # The thresholds are used to consider what is a "Match"
+  # As with any automation there is never a 100% guarantee of accuracy.
+  # There will be times the script will mess up.
+  # If however you see it messing up more often on things you can restrict the threshold.
   # 0 = Anything goes, 100 = Must be exact match
   # The default numbers here are based upon what I've seen to be the most effective, I've had one-offs where I had to manually fix things.
-  # Eg. Hanna vs Anna, One letter difference, and in the case I had the years were the same too.
-  movies_threshold: 96
-  series_threshold: 96
   collection_threshold: 99
   # Decide which radarr instance you will be using for renamer, this is useful if you have,
   # for example, A Sonarr/Sonarr-Anime and/or Radarr/Radarr-Anime

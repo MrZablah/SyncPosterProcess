@@ -3,7 +3,7 @@
 # Description: This script will check for unmatched assets in your Plex library.
 #              It will output the results to a file in the logs folder.
 # This is a modified version of the original script by Drazzilb:
-# Version: 5.3.6
+# Version: 5.3.7
 # you can find the original script here: https://github.com/Drazzilb08/userScripts/blob/master/python-scripts/renamer.py
 # ===================================================================================================
 
@@ -170,6 +170,11 @@ def match_media(media, source_file_list, type):
         alternate_titles = []
         normalized_alternate_titles = []
         arr_title = item['title']
+        try:
+            if item['originalTitle']:
+                arr_title = item['originalTitle']
+        except KeyError:
+            pass
         arr_path = os.path.basename(item['path'])
         arr_path = year_regex.sub("", arr_path).strip()
         normalized_arr_path = normalize_titles(arr_path)
@@ -439,6 +444,7 @@ def normalize_titles(title):
     normalized_title = normalized_title.rstrip()
     normalized_title = normalized_title.replace('&', 'and')
     normalized_title = re.sub(remove_special_chars, '', normalized_title).lower()
+    normalized_title = normalized_title.replace(' ', '')
     return normalized_title
 
 
