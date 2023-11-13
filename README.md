@@ -145,14 +145,15 @@ sync_gdrive:
 ## Renamer
 ```yaml
 renamer:
-  run: true # If false it will skip this step
+  run: true # If false, it will skip this step
   # Options are 'true' or 'false'
   dry_run: true # dry_run can be true or false, if true it will not actually rename anything
   asset_folders: false
   # Options are 'copy' or 'move'
   action_type: copy
   print_only_renames: false # If print_only_renames is True, then we don't want to print files that don't need to be renamed
-  # Library names are used to match collections posters to the collections listed w/in Plex. Typically Movie Libraries are used
+  # Library names are used to match collection posters to the collections listed w/in Plex.
+  # Typically, Movie Libraries are used
   library_names:
     - Movies
     - TV Shows
@@ -167,16 +168,17 @@ renamer:
     - /path/to/posters/override2/ <--- Highest priority
   # Where your posters are going to go. In my usecase I use Plex-Meta-Manager. This is the /config/assets dir for PMM for me.
   destination_dir: /path/to/poster/destination
-  # The thresholds are used to consider what is a "Match", As with any automation there is never a 100% guarantee of accuracy. There will be times the script will mess up.
+  # The thresholds are used to consider what is a "Match"
+  # As with any automation there is never a 100% guarantee of accuracy.
+  # There will be times the script will mess up.
   # If however you see it messing up more often on things you can restrict the threshold.
   # 0 = Anything goes, 100 = Must be exact match
   # The default numbers here are based upon what I've seen to be the most effective, I've had one-offs where I had to manually fix things.
-  # Eg. Hanna vs Anna, One letter difference and in the case I had the years were the same too.
-  movies_threshold: 96
-  series_threshold: 96
   collection_threshold: 99
-  # Decide which radarr instance you will be using for renamer, this is useful if you have for example: A Sonarr/Sonarr-Anime and/or Radarr/Radarr-Anime
-  # If you however duplicate entries between a Radarr/Radarr4K for example. this won't help and will only double the work for the script for no gain.
+  # Decide which radarr instance you will be using for renamer, this is useful if you have,
+  # for example, A Sonarr/Sonarr-Anime and/or Radarr/Radarr-Anime
+  # If you however duplicate entries between a Radarr/Radarr4K for example.
+  # This won't help and will only double the work for the script for no gain.
   radarr:
     - name: radarr_1
   sonarr:
