@@ -2,7 +2,8 @@
 # Name: renamer.py
 # Description: This script will check for unmatched assets in your Plex library.
 #              It will output the results to a file in the logs folder.
-# This is a modified version of the original script by Drazzilb, Version: 5.3.4
+# This is a modified version of the original script by Drazzilb:
+# Version: 5.3.6
 # you can find the original script here: https://github.com/Drazzilb08/userScripts/blob/master/python-scripts/renamer.py
 # ===================================================================================================
 
@@ -179,7 +180,7 @@ def match_media(media, source_file_list, type):
             if item['status'] == 'upcoming' or item['status'] == 'announced':
                 continue
             else:
-                logger.warning(f"Unable to find year in path: {item['path']}")
+                logger.warning(f"Unable to find year in {item['title']} path")
         try:
             if item['alternateTitles']:
                 for i in item['alternateTitles']:
@@ -491,9 +492,8 @@ def sort_files(files, path, dict, basename):
 
 
 def get_assets_files(assets_path, override_paths):
-    asset_files = {"series": [], "movies": [], "collections": []}
-    override_files = {"series": [], "movies": [], "collections": []}
-    asset_types = ['series', 'movies', 'collections']
+    asset_files = {asset_type: [] for asset_type in ['series', 'movies', 'collections']}
+    override_files = {asset_type: [] for asset_type in ['series', 'movies', 'collections']}
     if assets_path:
         files = get_files(assets_path)
         basename = os.path.basename(assets_path.rstrip('/'))
@@ -501,40 +501,37 @@ def get_assets_files(assets_path, override_paths):
     if isinstance(override_paths, str):
         override_paths = [override_paths]
     if override_paths:
-        for paths in override_paths:
-            files = get_files(paths)
-            basename = os.path.basename(paths.rstrip('/'))
-            override_files = sort_files(files, paths, override_files, basename)
+        for path in tqdm(override_paths, desc="Processing override paths", total=len(override_paths)):
+            files = get_files(path)
+            basename = os.path.basename(path.rstrip('/'))
+            override_files = sort_files(files, path, override_files, basename)
             if override_files and asset_files:
-                asset_files = handle_override_files(asset_files, override_files, asset_types)
-    for asset_types in asset_files:
-        for asset in asset_files[asset_types]:
+                asset_files = handle_override_files(asset_files, override_files, path, asset_types=['series', 'movies', 'collections'])
+    for asset_type in asset_files:
+        for asset in asset_files[asset_type]:
             normalized_title = normalize_titles(asset['title'])
             asset['normalized_title'] = normalized_title
-    for asset_types in asset_files:
-        for asset in asset_files[asset_types]:
             asset['files'].sort()
     logger.debug(json.dumps(asset_files, indent=4))
     return asset_files
 
 
-def handle_override_files(asset_files, override_files, asset_types):
+def handle_override_files(asset_files, override_files, path, asset_types):
     for type in asset_types:
         for override_asset in override_files[type]:
-            found = False
+            asset_found = False
             for asset in asset_files[type]:
                 if override_asset['title'] == asset['title'] and override_asset['year'] == asset['year']:
-                    found = True
-                    seen_files = set()
-                    logger.debug(f"Override asset: {override_asset['title']} {override_asset['year']} will be used instead of {asset['title']} {asset['year']}")
+                    asset_found = True
                     for override_file in override_asset['files']:
-                        override_file_name = os.path.splitext(os.path.basename(override_file))[0]
-                        if override_file_name not in seen_files:
-                            seen_files.add(override_file_name)
-                            asset['files'] = [f for f in asset['files'] if os.path.splitext(os.path.basename(f))[0] != override_file_name]
-                            asset['files'].append(override_file)
-            if not found:
+                        over_ride_file_name = os.path.split(override_file)[1]
+                        asset['files'] = [f for f in asset['files'] if os.path.split(f)[1] != over_ride_file_name]
+                        asset['files'].append(override_file)
+                        logger.debug(f"Override: Added {override_file} to {asset['title']}")
+                    break
+            if not asset_found:
                 asset_files[type].append(override_asset)
+                logger.debug(f"Override: Added {override_asset['title']} to {type} from {path}")
     return asset_files
 
 
