@@ -3,8 +3,8 @@
 # Description: This script will check for unmatched assets in your Plex library.
 #              It will output the results to a file in the logs folder.
 # This is a modified version of the original script by Drazzilb:
-# Version: 5.3.7
-# you can find the original script here: https://github.com/Drazzilb08/userScripts/blob/master/python-scripts/renamer.py
+# Version: 6.1.1
+# You can find the original script here: https://github.com/Drazzilb08/userScripts/blob/master/python-scripts/renamer.py
 # ===================================================================================================
 
 from fuzzywuzzy import fuzz
@@ -171,10 +171,9 @@ def match_media(media, source_file_list, type):
         normalized_alternate_titles = []
         arr_title = item['title']
         try:
-            if item['originalTitle']:
-                arr_title = item['originalTitle']
+            original_title = item['originalTitle']
         except KeyError:
-            pass
+            original_title = None
         arr_path = os.path.basename(item['path'])
         arr_path = year_regex.sub("", arr_path).strip()
         normalized_arr_path = normalize_titles(arr_path)
@@ -222,6 +221,7 @@ def match_media(media, source_file_list, type):
                     arr_normalized_title == file_normalized_title or
                     arr_path == file_title or
                     normalized_arr_path == file_normalized_title or
+                    original_title == file_title or
                     file_title in alternate_titles or
                     file_normalized_title in normalized_alternate_titles
             ) and (
@@ -250,6 +250,7 @@ def match_media(media, source_file_list, type):
                     arr_normalized_title == file_normalized_title or
                     arr_path == file_title or
                     normalized_arr_path == file_normalized_title or
+                    original_title == file_title or
                     file_title in alternate_titles or
                     file_normalized_title in normalized_alternate_titles
             ) and (
