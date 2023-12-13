@@ -29,7 +29,9 @@ import os
 import re
 import shutil
 
-config = Config(script_name="renamer")
+script_name = "renamer"
+config = Config(script_name)
+log_level = config.log_level
 logger = setup_logger(config.log_level, "spp")
 version(config.script_name, script_version, arrpy_py_version, logger, config)
 
