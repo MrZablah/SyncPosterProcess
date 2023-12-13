@@ -5,7 +5,6 @@ config_path = os.getenv('SPP_CONFIG', '/config/config.yml')
 
 
 class Config:
-
     def __init__(self, script_name):
         self.config_path = config_path
         self.script_name = script_name
@@ -18,6 +17,14 @@ class Config:
 
         # Load config into instance variables
         self.global_data = config['global']
+        try:
+            self.discord = config['discord']
+        except KeyError:
+            self.discord = {}
+        self.script_data = config.get(f'{self.script_name}', {})
+
+        # Load config into instance variables
+        self.global_data = config['global']
         self.script_data = config.get(f'{self.script_name}', {})
         self.run_now = self.global_data.get('run_now', False)  # Use False as default value for run_now if not provided
         self.schedule_hour = self.global_data.get('schedule_hour', 4)  # Use '4' as default schedule_hour if not provided
@@ -27,6 +34,7 @@ class Config:
         self.plex_data = self.global_data.get('plex', {})  # Use empty dict if plex data is not found
         self.radarr_data = self.global_data.get('radarr', {})  # Use empty dict if radarr data is not found
         self.sonarr_data = self.global_data.get('sonarr', {})  # Use empty dict if sonarr data is not found
+        self.qbit_data = self.global_data.get('qbittorrent', {})  # Use empty dict if qbit data is not found
         self.run = self.script_data.get('run', True)  # By default, run the script if not specified
 
         # Typical variables
@@ -34,6 +42,7 @@ class Config:
         self.asset_folders = self.script_data.get('asset_folders', [])  # Use empty list as default value for asset_folders if not provided
         self.radarr = self.script_data.get('radarr', False)  # Use False as default value for radarr if not provided')
         self.sonarr = self.script_data.get('sonarr', False)  # Use False as default value for sonarr if not provided')
+        self.qbit = self.script_data.get('qbittorrent', False)  # Use False as default value for qbit if not provided')
 
         # Plex variables
         self.library_names = self.script_data.get('library_names', [])  # Use empty list as default value for library_names if not provided

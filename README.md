@@ -1,8 +1,9 @@
-<div align="center">
+<div style="text-align:center">
 
 # SyncPosterProcess
 
-This is a simple script that is meant to used with the provided Dockerfile or the docker container on the [Docker Hub](https://hub.docker.com/r/mrzablah/spp) or [GHCR](https://github.com/MrZablah/SyncPosterProcess/pkgs/container/spp).
+This is a simple script
+meant to be used with the provided Dockerfile or the docker container on the [Docker Hub](https://hub.docker.com/r/mrzablah/spp) or [GHCR](https://github.com/MrZablah/SyncPosterProcess/pkgs/container/spp).
 
 </div>
 
@@ -27,18 +28,18 @@ This is an all-in-one solution for the following scripts:
 - [Stupifier Script provided in Discord](https://discord.com/channels/492590071455940612/1124032073557086258/1126226814629576858)
 This is script will sync a directory with a Google Drive folder. 
 - [Drazzilb08 User Scripts](https://github.com/Drazzilb08/userScripts)
-This script will fix naming of the images base on the naming you have on arr apps.
+This script will fix naming of the image based on the naming you have on arr apps.
 - [MM2k-BORDER-REPLACER](https://github.com/listentofaze/mm2k-border-replacer/tree/main)
-This script will replace or removed the borders of the images.
+This script will replace or remove the borders of the images.
 
 # How to use it?
 
-The recommend use of the script is to use the docker container provided in the 
+The recommended use of the script is to use the docker container provided in the 
 [Docker Hub](https://hub.docker.com/r/mrzablah/spp) or [GHCR](https://github.com/MrZablah/SyncPosterProcess/pkgs/container/spp)
-and configure it as explain below, but you can also use the script directly.
+and configure it as explained below, but you can also use the script directly.
 
 # Docker
-They are several ways to run the docker container, but the recommend way is to use the following command:
+There are several ways to run the docker container, but the recommended way is to use the following command:
 ```bash
 docker run -d \
     --name spp \
@@ -50,7 +51,7 @@ docker run -d \
     -e UMASK=000 \
     mrzablah/spp:latest
 ```
-Keep in mind that you need to change the TZ variable to your timezone so you can se the schedule correctly,
+Keep in mind that you need to change the TZ variable to your timezone, so you can se the schedule correctly,
 and the volumes to the path you want to use.
 
 ## Parameters
@@ -73,7 +74,7 @@ The first part to change is the global section:
 ```yaml
 global:
   run_now: true # If true it will run the script immediately, if false it will wait until the schedule_hour
-  schedule_hour: 4 # This is the hour of the day you want the script to run, it's based on a 24 hour clock and defaults to 4am
+  schedule_hour: 4 # This is the hour of the day you want the script to run, it's based on a 24-hour clock and defaults to 4am
   log_level: info # log_level can be: debug, info, warning, error, critical
   radarr:
     # name is the name of the radarr instance, this is used to reference the instance in other scripts
@@ -99,36 +100,53 @@ global:
   plex:
     # name is the name of the plex instance, this is used to reference the instance in other scripts
     - name: plex
-      # api is the token key for the plex instance, if you don't know your token please see https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
+      # api is the token key for the plex instance, if you don't know your token, please see https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
       api: abcdefghijlmnop
       # url is the url for the plex instance
       url: http://localhost:32400
 ```
 
+## Discord and Notifiarr
+This is the section for discord and notifiarr. If you don't use any of them, you can leave this blank.
+```yaml
+discord:
+  # This is the webhook for Notifiarr. if you don't use Notifiarr, you can leave this blank
+  notifiarr_webhook:
+  # These are the webhooks for the discord scripts. if you don't use discord, you can leave these blanks
+  renamer:
+    # This is the discord webhook for this script
+    discord_webhook:
+    # This is the channel id for the discord script. Channel id is only needed if using Notifiarr
+    channel_id:
+  unmatched-assets:
+    discord_webhook:
+    channel_id:
+```
+
 ## Sync Google Drive
-There are sections for each of script,
+There are sections for each of scripts,
 you can enable or disable any of the script with the `run` variable.
 
-1. Get rclone client ID and Secret following these [instructions](https://rclone.org/drive/#making-your-own-client-id)
+1. Get RClone client ID and Secret following these [instructions](https://rclone.org/drive/#making-your-own-client-id)
 2. Then get a token following these [instructions](https://rclone.org/remote_setup/)
 
-> Alternative use Google Cloud Service Account instead of token:
-- Creating and using this option will make it, so you don't need to create the token manually but I will still strongly
+> Alternatively, use Google Cloud Service Account instead of token:
+- Creating and using this option will make it, so you don't need to create the token manually, but I will still strongly
   recommend to still add the Client ID and Client Secret and just change the token to SA, otherwise you might reach some limits.
 
 > Instructions for creating a Google Cloud Service Account
 1. To create a service account and obtain its credentials, go to the [Google Developer Console](https://console.developers.google.com/).
-2. You must have a project - create one if you don't.
-3. Then go to "IAM & admin" -> "Service Accounts".
+2. You must have a project—create one if you don't.
+3. Then go to "IAM & admin" -> "Service Accounts."
 4. Use the "Create Service Account" button. Fill in "Service account name" and "Service account ID" with something that identifies your client.
-5. Select "Create And Continue". Step 2 and 3 are optional.
-6. Once created you will need to go to the Actions of the SA -> Manage Keys and create a JSON key and saved it as a file.
+5. Select "Create And Continue." Step 2 and 3 are optional.
+6. Once created, you will need to go to the Actions of the SA -> Manage Keys and create a JSON key and save it as a file.
 7. These credentials are what rclone will use for authentication. If you ever need to remove access, press the "Delete service account key" button.
 
-> As a fallback you can use sync_location and gdrive_id, but this is deprecated and will be removed in the future.
+> As a fallback, you can use sync_location and gdrive_id, but this is deprecated and will be removed in the future.
 ```yaml
 sync_gdrive:
-  run: true # If false it will skip this step
+  run: true # If false, it will skip this step
   client_id: asdasds.apps.googleusercontent.com # Client ID for rclone usually ends with .apps.googleusercontent.com
   client_secret: GOCSPX-asda123 # Client Secret for rclone, usually starts with GOCSPX-
   token: # The token for rclone, this is the output of rclone config dump that needs to run manually
@@ -147,7 +165,7 @@ sync_gdrive:
 renamer:
   run: true # If false, it will skip this step
   # Options are 'true' or 'false'
-  dry_run: true # dry_run can be true or false, if true it will not actually rename anything
+  dry_run: true # dry_run can be true or false, if true, it will not rename anything
   asset_folders: false
   # Options are 'copy' or 'move'
   action_type: copy
@@ -169,15 +187,15 @@ renamer:
   # Where your posters are going to go. In my usecase I use Plex-Meta-Manager. This is the /config/assets dir for PMM for me.
   destination_dir: /path/to/poster/destination
   # The thresholds are used to consider what is a "Match"
-  # As with any automation there is never a 100% guarantee of accuracy.
-  # There will be times the script will mess up.
-  # If however you see it messing up more often on things you can restrict the threshold.
+  # As with any automation, there is never a 100% guarantee of accuracy.
+  # There will be timed the script will mess up.
+  # If, however, you see it messing up more often on things, you can restrict the threshold.
   # 0 = Anything goes, 100 = Must be exact match
   # The default numbers here are based upon what I've seen to be the most effective, I've had one-offs where I had to manually fix things.
   collection_threshold: 99
   # Decide which radarr instance you will be using for renamer, this is useful if you have,
   # for example, A Sonarr/Sonarr-Anime and/or Radarr/Radarr-Anime
-  # If you however duplicate entries between a Radarr/Radarr4K for example.
+  # If you however duplicate entries between a Radarr/Radarr4K, for example.
   # This won't help and will only double the work for the script for no gain.
   radarr:
     - name: radarr_1
@@ -189,13 +207,13 @@ renamer:
 ## Border Replacer
 ```yaml
 fix_border:
-  run: true # If false it will skip this step
+  run: true # If false, it will skip this step
   input_folder: /data/input # Where your posters are going to be coming from
   output_folder: /data/fix_posters # Where your posters are going to go
-  border_color: none # This will remove the border of the image, but you can also add a color to change th border to any hex color, Ej: '#000000'
-  overwrite_existing: true # If true it will overwrite the existing poster, if false it will skip the poster
-  resize: false # If true it will resize the poster to 1000x1500, this requires border_color to be set to a 'none'
-  bottom_only: false # If true it will only keep the bottom border, this requires border_color to be set to a color Ej: '#000000'
+  border_color: none # This will remove the border of the image, but you can also add a color to change the border to any hex color, Ej: '#000000'
+  overwrite_existing: true # If true, it will overwrite the existing poster, if false it will skip the poster
+  resize: false # If true, it will resize the poster to 1000x1500; this requires border_color to be set to a 'none'
+  bottom_only: false # If true, it will only keep the bottom border; this requires border_color to be set to a color Ej: '#000000'
 ```
 
 

@@ -37,6 +37,19 @@ global:
       # url is the url for the plex instance
       url: http://localhost:32400
 
+discord:
+  # This is the webhook for Notifiarr, if you don't use Notifiarr you can leave this blank
+  notifiarr_webhook:
+  # These are the webhooks for the discord scripts, if you don't use discord you can leave these blank
+  renamer:
+    # This is the discord webhook for this script
+    discord_webhook:
+    # This is the channel id for the discord script. Channel id is only needed if using Notifiarr
+    channel_id:
+  unmatched-assets:
+    discord_webhook:
+    channel_id:
+
 # THIS SCRIPT SYNCS GDRIVE TO A LOCAL FOLDER. ANYTHING UNIQUE IN THE FOLDER WILL BE DELETED.
 # -> You can use client_id, client_secret, and token to authenticate, or you can use gdrive_sa_location to use a service account.
 # DRAZZILB GDRIVE ID: 1VeeQ_frBFpp6AZLimaJSSr0Qsrl6Tb7z
@@ -142,7 +155,8 @@ unmatched_assets:
     - "The Batman Universe"
     - "Collectionless"
     - "DC Extended Universe"
-  assets_path: /path/to/poster-assets/
+  assets_paths:
+    - /path/to/poster-assets/
   media_paths:
     - /path/to/media/folders/movies
     - /path/to/media/folders/tv-shows

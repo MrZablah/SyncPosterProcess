@@ -3,9 +3,10 @@
 # Description: This script will check for unmatched assets in your Plex library.
 #              It will output the results to a file in the logs folder.
 # This is a modified version of the original script by Drazzilb:
-# Version: 5.3.7
 # you can find the original script here: https://github.com/Drazzilb08/userScripts/blob/master/python-scripts/renamer.py
 # ===================================================================================================
+
+script_version = "6.3.2"
 
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
@@ -14,8 +15,12 @@ from plexapi.server import PlexServer
 from tqdm import tqdm
 from unidecode import unidecode
 from utility.arrpy import StARR
+from utility.arrpy import arrpy_py_version
 from utility.config import Config
+from utility.discord import discord, field_builder
+from utility.formatting import create_table
 from utility.logger import setup_logger
+from utility.version import version
 import errno
 import filecmp
 import html
@@ -26,6 +31,7 @@ import shutil
 
 config = Config(script_name="renamer")
 logger = setup_logger(config.log_level, "spp")
+version(config.script_name, script_version, arrpy_py_version, logger, config)
 
 year_regex = re.compile(r"\((19|20)\d{2}\)")
 illegal_chars_regex = re.compile(r'[<>:"/\\|?*\x00-\x1f]+')
@@ -171,10 +177,9 @@ def match_media(media, source_file_list, type):
         normalized_alternate_titles = []
         arr_title = item['title']
         try:
-            if item['originalTitle']:
-                arr_title = item['originalTitle']
+            original_title = item['originalTitle']
         except KeyError:
-            pass
+            original_title = None
         arr_path = os.path.basename(item['path'])
         arr_path = year_regex.sub("", arr_path).strip()
         normalized_arr_path = normalize_titles(arr_path)
@@ -222,6 +227,7 @@ def match_media(media, source_file_list, type):
                     arr_normalized_title == file_normalized_title or
                     arr_path == file_title or
                     normalized_arr_path == file_normalized_title or
+                    original_title == file_title or
                     file_title in alternate_titles or
                     file_normalized_title in normalized_alternate_titles
             ) and (
@@ -250,6 +256,7 @@ def match_media(media, source_file_list, type):
                     arr_normalized_title == file_normalized_title or
                     arr_path == file_title or
                     normalized_arr_path == file_normalized_title or
+                    original_title == file_title or
                     file_title in alternate_titles or
                     file_normalized_title in normalized_alternate_titles
             ) and (
@@ -279,6 +286,7 @@ def match_media(media, source_file_list, type):
 
 def rename_file(matched_media, destination_dir, dry_run, action_type, print_only_renames):
     messages = []
+    discord_messages = []
     asset_folders = config.asset_folders
     destination_files = os.listdir(destination_dir)
     for media in tqdm(matched_media['matched_media'], desc="Renaming files", total=len(matched_media['matched_media']), disable=None):
@@ -286,11 +294,13 @@ def rename_file(matched_media, destination_dir, dry_run, action_type, print_only
         folder = media['folder']
         if asset_folders:
             if dry_run:
-                messages.append(f"Would create asset folder: {folder} at {destination_dir}")
+                if not os.path.exists(os.path.join(destination_dir, folder)):
+                    discord_messages.append(folder)
             else:
                 if not os.path.exists(os.path.join(destination_dir, folder)):
-                    messages.append(f"Creating asset folder: {folder} at {destination_dir}")
+                    messages.append(f"Creating asset folder: {folder}")
                     os.makedirs(os.path.join(destination_dir, folder), exist_ok=True)
+                    discord_messages.append(folder)
         for file in files:
             path = os.path.dirname(file)
             old_file_name = os.path.basename(file)
@@ -353,15 +363,25 @@ def rename_file(matched_media, destination_dir, dry_run, action_type, print_only
                                     messages.append(f"Removed {i} from {destination_dir}")
                                     os.remove(os.path.join(destination_dir, i))
             if new_file_name != old_file_name:
-                messages.extend(process_file(old_file_name, new_file_name, action_type, dry_run, destination_file_path, source_file_path, '-renamed->'))
+                processsed_file_info, discord_message = process_file(old_file_name, new_file_name, action_type, dry_run, destination_file_path, source_file_path, '-renamed->')
+                messages.extend(processsed_file_info)
+                if not asset_folders:
+                    discord_messages.extend(discord_message)
             else:
                 if not print_only_renames:
-                    messages.extend(process_file(old_file_name, new_file_name, action_type, dry_run, destination_file_path, source_file_path, '-not-renamed->>'))
-    return messages
+                    processsed_file_info, discord_message = process_file(old_file_name, new_file_name, action_type, dry_run, destination_file_path, source_file_path, '-not-renamed->>')
+                    messages.extend(processsed_file_info)
+                    if not asset_folders:
+                        discord_messages.extend(discord_message)
+            if not asset_folders:
+                for i in discord_messages:
+                    discord_messages = [i.split('.')[0] for i in discord_messages]
+    return messages, discord_messages
 
 
 def process_file(old_file_name, new_file_name, action_type, dry_run, destination_file_path, source_file_path, arrow):
     output = []
+    discord_output = []
     if dry_run:
         if action_type == 'copy':
             if os.path.isfile(destination_file_path):
@@ -370,8 +390,10 @@ def process_file(old_file_name, new_file_name, action_type, dry_run, destination
                     pass
                 else:
                     output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+                    discord_output.append(new_file_name)
             else:
                 output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+                discord_output.append(new_file_name)
         if action_type == 'hardlink':
             if os.path.isfile(destination_file_path):
                 if filecmp.cmp(source_file_path, destination_file_path):
@@ -379,10 +401,13 @@ def process_file(old_file_name, new_file_name, action_type, dry_run, destination
                     pass
                 else:
                     output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+                    discord_output.append(new_file_name)
             else:
                 output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+                discord_output.append(new_file_name)
         elif action_type == 'move':
             output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+            discord_output.append(new_file_name)
     else:
         if action_type == 'copy':
             try:
@@ -393,21 +418,25 @@ def process_file(old_file_name, new_file_name, action_type, dry_run, destination
                     else:
                         shutil.copyfile(source_file_path, destination_file_path)
                         output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+                        discord_output.append(new_file_name)
                 else:
                     shutil.copyfile(source_file_path, destination_file_path)
                     output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+                    discord_output.append(new_file_name)
             except OSError as e:
                 logger.error(f"Unable to copy file: {e}")
         elif action_type == 'move':
             try:
                 shutil.move(source_file_path, destination_file_path)
                 output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+                discord_output.append(new_file_name)
             except OSError as e:
                 logger.error(f"Unable to move file: {e}")
         elif action_type == 'hardlink':
             try:
                 os.link(source_file_path, destination_file_path)
                 output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+                discord_output.append(new_file_name)
             except OSError as e:
                 if e.errno == errno.EEXIST:
                     if os.path.samefile(source_file_path, destination_file_path):
@@ -417,12 +446,13 @@ def process_file(old_file_name, new_file_name, action_type, dry_run, destination
                         os.replace(destination_file_path, source_file_path)
                         os.link(source_file_path, destination_file_path)
                         output.append(f"Action Type: {action_type.capitalize()}: {old_file_name} {arrow} {new_file_name}")
+                        discord_output.append(new_file_name)
                 else:
                     logger.error(f"Unable to hardlink file: {e}")
                     return
         else:
             logger.error(f"Unknown action type: {action_type}")
-    return output
+    return output, discord_output
 
 
 def load_dict(title, year, files):
@@ -560,10 +590,32 @@ def process_instance(instance_type, instance_name, url, api, final_output, asset
         else:
             message = f"Error: No library names specified for {instance_name}"
             final_output.append(message)
-            return final_output
+            return final_output, None
+        # get friendly name of plex server
+        server_name = app.friendlyName
+        data = [
+            [f"Plex Server: {server_name}"],
+        ]
+        create_table(data, log_level="info", logger=logger)
     else:
         app = StARR(url, api, logger)
         media = app.get_media()
+        server_name = app.get_instance_name()
+        data = [
+            [server_name],
+        ]
+        create_table(data, log_level="info", logger=logger)
+    data = [
+        [f"{server_name} Settings"]
+    ]
+    create_table(data, log_level="debug", logger=logger)
+    logger.debug('*' * 40)
+    logger.debug(f"Script Settings for {instance_name}:")
+    logger.debug(f'{"URL:":<20}{url if url else "Not Set"}')
+    logger.debug(f'{"API:":<20}{"*" * (len(api) - 5)}{api[-5:] if api else "Not Set"}')
+    logger.debug(f'{"Instance Type:":<20}{instance_type if instance_type else "Not Set"}')
+    logger.debug(f'{"ARR name:":<20}{server_name if instance_name else "Not Set"}')
+    logger.debug('*' * 40 + '\n')
     matched_media = []
     if instance_type == "Plex":
         matched_media = match_collection(collection_names, asset_files, config.collection_threshold)
@@ -572,12 +624,12 @@ def process_instance(instance_type, instance_name, url, api, final_output, asset
     elif instance_type == "Sonarr":
         matched_media = match_media(media, asset_files, "series")
     if matched_media:
-        message = rename_file(matched_media, config.destination_dir, config.dry_run, config.action_type, config.print_only_renames)
+        message, discord_messages = rename_file(matched_media, config.destination_dir, config.dry_run, config.action_type, config.print_only_renames)
         final_output.extend(message)
     else:
         message = f"No matches found for {instance_name}"
         final_output.append(message)
-    return final_output
+    return final_output, discord_messages
 
 
 def print_output(final_output):
@@ -589,35 +641,48 @@ def print_output(final_output):
         return
 
 
+def notification(file_list):
+    if file_list:
+        for instance_type, file_list in file_list.items():
+            if not file_list:
+                continue
+            fields = field_builder(file_list, name="Renamed Posters")
+            for field_number, field in fields.items():
+                discord(field, logger, config, script_name, description=f"Number of posters added {len(file_list)}", color=0x00FF00, content=None)
+        else:
+            return
+
+
 def main():
     if not config.run:
         logger.info("Skipping renamer.py")
         return
 
-    logger.debug('*' * 40)
-    logger.debug(f'* {"Script Input Validated":^36} *')
-    logger.debug('*' * 40)
-    logger.debug(f'{" Script Settings ":*^40}')
-    logger.debug(f'Dry_run: {config.dry_run}')
-    logger.debug(f"Log Level: {config.log_level}")
-    logger.debug(f"Asset folder: {config.asset_folders}")
-    logger.debug(f"library_names: {config.library_names}")
-    logger.debug(f"source_dir: {config.source_dir}")
-    logger.debug(f"source_overrides: {config.source_overrides}")
-    logger.debug(f"destination_dir: {config.destination_dir}")
-    logger.debug(f"collection_threshold: {config.collection_threshold}")
-    logger.debug(f"action_type: {config.action_type}")
-    logger.debug(f"print_only_renames: {config.print_only_renames}")
+    data = [
+        ["Script Settings"],
+    ]
+
+    create_table(data, log_level="debug", logger=logger)
+
     logger.debug(f'*' * 40)
-    logger.debug('')
+    logger.debug(f'{"Dry_run:":<20}{config.dry_run if config.dry_run else "False"}')
+    logger.debug(f'{"Log level:":<20}{log_level if log_level else "INFO"}')
+    logger.debug(f'{"Asset folders:":<20}{config.asset_folders if config.asset_folders else "False"}')
+    logger.debug(f'{"Library names:":<20}{config.library_names if config.library_names else "Not set"}')
+    logger.debug(f'{"Source dir:":<20}{config.source_dir if config.source_dir else "Not set"}')
+    logger.debug(f'{"Source overrides:":<20}{config.source_overrides if config.source_overrides else "Not set"}')
+    logger.debug(f'{"Destination dir:":<20}{config.destination_dir if config.destination_dir else "Not set"}')
+    logger.debug(f'{"Threshold:":<20}{config.collection_threshold}')
+    logger.debug(f'{"Action type:":<20}{config.action_type}')
+    logger.debug(f'{"Print only renames:":<20}{config.print_only_renames}')
+    logger.debug(f'*' * 40 + '\n')
 
     if config.dry_run:
-        logger.info('*' * 40)
-        logger.info(f'* {"Dry_run Activated":^36} *')
-        logger.info('*' * 40)
-        logger.info(f'* {" NO CHANGES WILL BE MADE ":^36} *')
-        logger.info('*' * 40)
-        logger.info('')
+        data = [
+            ["Dry Run"],
+            ["NO CHANGES WILL BE MADE"]
+        ]
+        create_table(data, log_level="info", logger=logger)
 
     asset_files = get_assets_files(config.source_dir, config.source_overrides)
 
@@ -626,7 +691,7 @@ def main():
         'Radarr': config.radarr_data,
         'Sonarr': config.sonarr_data
     }
-
+    discord_output = {}
     for instance_type, instances in instance_data.items():
         for instance in instances:
             final_output = []
@@ -645,12 +710,7 @@ def main():
             elif instance_type == "Plex":
                 script_name = instance_name
             if script_name and instance_name == script_name:
-                logger.info('*' * 40)
-                logger.info(f'* {instance_name:^36} *')
-                logger.info('*' * 40)
-                logger.debug(f'{" Settings ":*^40}')
-                logger.debug(f"Instance Name: {instance_name}")
-                logger.debug(f"URL: {url}")
-                logger.debug(f"API Key: {'<redacted>' if api else 'None'}")
-                final_output = process_instance(instance_type, instance_name, url, api, final_output, asset_files)
+                final_output, file_list = process_instance(instance_type, instance_name, url, api, final_output, asset_files)
+                discord_output[instance_name] = file_list
                 print_output(final_output)
+    notification(discord_output)
