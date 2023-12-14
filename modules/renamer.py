@@ -6,7 +6,7 @@
 # you can find the original script here: https://github.com/Drazzilb08/userScripts/blob/master/python-scripts/renamer.py
 # ===================================================================================================
 
-script_version = "6.3.2"
+script_version = "6.3.3"
 
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
@@ -377,7 +377,7 @@ def rename_file(matched_media, destination_dir, dry_run, action_type, print_only
                         discord_messages.extend(discord_message)
             if not asset_folders:
                 for i in discord_messages:
-                    discord_messages = [i.split('.')[0] for i in discord_messages]
+                    discord_messages = [os.path.splitext(i)[0] for i in discord_messages]
     return messages, discord_messages
 
 
@@ -587,13 +587,14 @@ def process_instance(instance_type, instance_name, url, api, final_output, asset
                     collections += library.collections()
                 except BadRequest:
                     logger.error(f"Error: {library_name} does not exist in {instance_name}")
-            collection_names = [collection.title for collection in collections if collection.smart != True]
+            # collection_names = [collection.title for collection in collections if collection.smart != True]
+            collection_names = [collection.title for collection in collections]
             logger.debug(json.dumps(collection_names, indent=4))
         else:
             message = f"Error: No library names specified for {instance_name}"
             final_output.append(message)
             return final_output, None
-        # get friendly name of plex server
+        # get freindlyname of plex server
         server_name = app.friendlyName
         data = [
             [f"Plex Server: {server_name}"],

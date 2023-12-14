@@ -21,7 +21,9 @@ class Config:
             self.discord = config['discord']
         except KeyError:
             self.discord = {}
-        self.script_data = config.get(f'{self.script_name}', {})
+        self.script_data = config.get(f'{self.script_name}', None)
+        if self.script_data is None:
+            raise ValueError(f"Script data for '{self.script_name}' not found in the config.")
 
         # Load config into instance variables
         self.global_data = config['global']
