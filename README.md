@@ -1,3 +1,6 @@
+# :warning::no_entry: [DEPRECATED] THIS PROJECT IS NOT LONGER BEING MAINTANE :no_entry::warning:
+This repo will not longer get updates you should instead use: https://github.com/Drazzilb08/daps/wiki
+
 <div style="text-align:center">
 
 # SyncPosterProcess
